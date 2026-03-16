@@ -6,3 +6,6 @@ Project 17
 
 ## Jose Israel Carmona Morales:
 > "Be of good cheer. The future is as bright as your faith." - _Thomas S. Monson_
+
+## Nefi Muniz dos Santos:
+# "Trust the Savior and engage, patiently and diligently, in doing your part with all your heart." - Elder Dieter F. Uchtdorf
