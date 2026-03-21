@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Sniglet&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #000000;
+  font-family: "Poppins", sans-serif;
+  color: #EEF5FB;
+}
+
+main {
+  min-height: 100vh;
+  background: 
+    radial-gradient(ellipse at top left, #06D6A0 0%, transparent 30%),
+    radial-gradient(ellipse at bottom right, #06D6A0 0%, transparent 35%),
+    #000000;
+}
