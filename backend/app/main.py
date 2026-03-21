@@ -2,10 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import boards, lists, tasks, labels
-
-# ── oAuth: uncomment this once you create app/routers/auth.py ──────────────
-# from app.routers import auth
+from app.routers import boards, lists, tasks, labels, auth
 
 app = FastAPI(
     title="FocusDesk API",
@@ -25,13 +22,18 @@ app.add_middleware(
 )
 
 # ── Routers ───────────────────────────────────────────────────────────────────
-# oAuth: add this line once your auth router is ready:
-#   app.include_router(auth.router)
+app.include_router(auth.router, prefix="/api")
 app.include_router(boards.router)
 app.include_router(lists.router)
 app.include_router(tasks.router)
 app.include_router(labels.router)
 
+
+# ── Endpoints ───────────────────────────────────────────────────────────────────
+
+@app.get("/")
+def read_root():
+    return {"message": "FocusDesk API is running on Debian 13"}
 
 @app.get("/api/health")
 def health_check():
