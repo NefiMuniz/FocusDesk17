@@ -11,7 +11,7 @@ const Footer = () => {
         <NavLink to="/">
           <img src={logo} alt="FocusDesk17" className={styles.logo} />
         </NavLink>
-        <p className={styles.copyright}>© {year} FocusDesk17</p>
+        <p className={styles.copyright}>© {year}</p>
       </div>
 
       <div className={styles.contact}>
