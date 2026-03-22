@@ -1,44 +1,58 @@
 .footer {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    align-items: center;
-    padding: 1rem 3rem;
-    background-color: #000000;
-    border-top: 3px solid transparent;
-    border-image: linear-gradient(to right, #118AB2, #06D6A0) 1;
-    color: #EEF5FB;
-    font-family: "Poppins", sans-serif;
-  }
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  align-items: center;
+  padding: 2rem 3rem;
+  background-color: #000000;
+  border-top: 3px solid transparent;
+  border-image: linear-gradient(to right, #118AB2, #06D6A0) 1;
+  color: #EEF5FB;
+  font-family: "Poppins", sans-serif;
+}
   
-  .logoSection {
-    grid-column: 2/3;
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    text-align: center;
-  }
+.logoSection {
+  grid-column: 2/3;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  text-align: center;
+}
   
-  .logo {
-    width: 60%;
-    height: auto;
-  }
-  
-  .copyright {
-    font-size: 1rem;
-    color: #EEF5FB;
-  }
-  
-  .contact {
-    grid-column: 3/4;
-    text-align: center;
-  }
-  
-  .contactTitle {
-    background: linear-gradient(to right, #118AB2, #06D6A0);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-family: "Sniglet", sans-serif;
-    font-size: 2rem;
-    margin: 0.8rem;
-  }
+.logo {
+  width: 60%;
+  height: auto;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover{
+  transform: translateY(-5px);
+}
+
+.copyright {
+  font-size: 1rem;
+  color: #EEF5FB;
+}
+
+.contact {
+  grid-column: 3/4;
+  text-align: center;
+  border-left: #06D6A0 1px solid;
+}
+
+.contactTitle {
+  background: linear-gradient(to right, #118AB2, #06D6A0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-family: "Sniglet", sans-serif;
+  font-size: 2rem;
+  font-weight: 100;
+  margin: 0.8rem;
+  padding-top: 1rem;
+  transition: transform 0.3s ease;
+}
+
+
+.contactTitle:hover{
+  transform: translateY(-5px);
+}
