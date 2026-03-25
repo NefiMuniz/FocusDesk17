@@ -1,16 +1,4 @@
 # ============================================================
-# (CRUD) — SPRINT 2 + SPRINT 3: Implement all endpoints here
-# ============================================================
-# ENDPOINTS TO BUILD:
-#   GET    /api/lists/{list_id}/tasks/     → all tasks in a column, sorted by position
-#   POST   /api/lists/{list_id}/tasks/     → create a task inside a column
-#   GET    /api/tasks/{id}                 → get one task with labels
-#   PATCH  /api/tasks/{id}                 → edit title, description, due_date, status
-#   PATCH  /api/tasks/{id}/reorder         → move task to new column/position (Sprint 3)
-#   POST   /api/tasks/{id}/labels/{label_id} → attach a label to a task
-#   DELETE /api/tasks/{id}/labels/{label_id} → detach a label from a task
-#   DELETE /api/tasks/{id}                 → delete a task
-#
 # REORDER LOGIC — Sprint 3 (critical for dnd-kit):
 #   Called after every drag-drop event on the frontend.
 #   1. If new_list_id != current list_id: move task to new list
@@ -34,6 +22,7 @@
 # ============================================================
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from uuid import UUID
 
@@ -45,6 +34,38 @@ from app.schemas.task import TaskCreate, TaskUpdate, TaskReorder, TaskResponse
 router = APIRouter(tags=["Tasks"])
 
 
+def get_task_or_404(db: Session, task_id: UUID, user_id: UUID) -> Task:
+    """
+    Fetches a task and verifies ownership by traversing:
+    task → list → board → user_id check.
+    """
+    task = (
+        db.query(Task)
+        .join(TaskList, Task.list_id == TaskList.id)
+        .join(Board, TaskList.board_id == Board.id)
+        .filter(Task.id == task_id, Board.user_id == user_id)
+        .first()
+    )
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return task
+
+
+def verify_list_owner(db: Session, list_id: UUID, user_id: UUID) -> TaskList:
+    """
+    Confirms the list exists and its parent board belongs to current_user.
+    """
+    task_list = (
+        db.query(TaskList)
+        .join(Board, TaskList.board_id == Board.id)
+        .filter(TaskList.id == list_id, Board.user_id == user_id)
+        .first()
+    )
+    if not task_list:
+        raise HTTPException(status_code=404, detail="List not found")
+    return task_list
+
+
 @router.get("/api/lists/{list_id}/tasks/", response_model=list[TaskResponse])
 def get_tasks(
     list_id: UUID,
@@ -52,16 +73,18 @@ def get_tasks(
     db: Session = Depends(get_db),
 ):
     """
-    Returns all tasks in a column, sorted by position (top to bottom).
-    Frontend: fetch when rendering a list column.
+    Returns all tasks in a column, sorted top-to-bottom by position.
+    Member 2: fetch when rendering a list column.
         queryKey: ['tasks', listId]
-        Render cards in the order they arrive — already sorted.
+        Render cards in the exact order returned — already sorted.
     """
-    # Sprint 2:
-    #   verify_list_owner(db, list_id, current_user.id)
-    #   return db.query(Task).filter(Task.list_id == list_id)
-    #            .order_by(Task.position).all()
-    return []
+    verify_list_owner(db, list_id, current_user.id)
+    return (
+        db.query(Task)
+        .filter(Task.list_id == list_id)
+        .order_by(Task.position)
+        .all()
+    )
 
 
 @router.post(
@@ -76,19 +99,29 @@ def create_task(
     db: Session = Depends(get_db),
 ):
     """
-    Creates a task inside a column.
-    Frontend: call from the "+ Add Task" button inside a column.
+    Creates a task inside a column. Appends at the end if position is omitted.
+    Member 2: call from the "+ Add Task" button inside a column.
         After success: invalidateQueries({ queryKey: ['tasks', listId] })
     """
-    # Sprint 2:
-    #   verify_list_owner(db, list_id, current_user.id)
-    #   max_pos = db.query(func.max(Task.position))
-    #               .filter(Task.list_id == list_id).scalar() or -1
-    #   position = payload.position if payload.position is not None else max_pos + 1
-    #   new_task = Task(**payload.model_dump(exclude={"position"}),
-    #                   list_id=list_id, position=position)
-    #   db.add(new_task); db.commit(); db.refresh(new_task); return new_task
-    raise HTTPException(status_code=501, detail="Sprint 2: not yet implemented")
+    verify_list_owner(db, list_id, current_user.id)
+
+    if payload.position is None:
+        max_pos = db.query(func.max(Task.position)).filter(
+            Task.list_id == list_id
+        ).scalar()
+        position = (max_pos + 1) if max_pos is not None else 0
+    else:
+        position = payload.position
+
+    new_task = Task(
+        **payload.model_dump(exclude={"position"}),
+        list_id=list_id,
+        position=position,
+    )
+    db.add(new_task)
+    db.commit()
+    db.refresh(new_task)
+    return new_task
 
 
 @router.get("/api/tasks/{task_id}", response_model=TaskResponse)
@@ -99,15 +132,11 @@ def get_task(
 ):
     """
     Returns a single task with its labels.
-    Frontend: call when user clicks a task card to open the detail modal.
+    Member 2: call when user clicks a task card to open the detail modal.
         queryKey: ['tasks', taskId]
         Response includes `labels` array — render each as a colored badge.
     """
-    # Sprint 2:
-    #   task = get_task_or_404(db, task_id)
-    #   verify_task_owner(db, task, current_user.id)
-    #   return task
-    raise HTTPException(status_code=501, detail="Sprint 2: not yet implemented")
+    return get_task_or_404(db, task_id, current_user.id)
 
 
 @router.patch("/api/tasks/{task_id}", response_model=TaskResponse)
@@ -120,17 +149,16 @@ def update_task(
     """
     Edits task fields (title, description, due_date, status).
     Does NOT move the task between lists — use /reorder for that.
-    Frontend: call from the task detail modal's save button.
+    Member 2: call from the task detail modal save button.
         After success: invalidateQueries({ queryKey: ['tasks', taskId] })
                     + invalidateQueries({ queryKey: ['tasks', listId] })
     """
-    # Sprint 2:
-    #   task = get_task_or_404(db, task_id)
-    #   verify_task_owner(db, task, current_user.id)
-    #   for field, value in payload.model_dump(exclude_unset=True).items():
-    #       setattr(task, field, value)
-    #   db.commit(); db.refresh(task); return task
-    raise HTTPException(status_code=501, detail="Sprint 2: not yet implemented")
+    task = get_task_or_404(db, task_id, current_user.id)
+    for field, value in payload.model_dump(exclude_unset=True).items():
+        setattr(task, field, value)
+    db.commit()
+    db.refresh(task)
+    return task
 
 
 @router.patch("/api/tasks/{task_id}/reorder", response_model=TaskResponse)
@@ -142,31 +170,34 @@ def reorder_task(
 ):
     """
     Moves a task to a new column and/or position after a drag-drop event.
-    Sprint 3 implementation.
-    Frontend (dnd-kit): call this in your onDragEnd handler every time a card is dropped.
+    Member 2 (dnd-kit): call this in your onDragEnd handler every time a card is dropped.
         Payload: { new_list_id: string (UUID), new_position: number }
         After success:
             invalidateQueries({ queryKey: ['tasks', sourceListId] })
             invalidateQueries({ queryKey: ['tasks', destinationListId] })
-    See TaskReorder schema in app/schemas/task.py for the full usage example.
     """
-    # Sprint 3:
-    #   task = get_task_or_404(db, task_id)
-    #   verify_task_owner(db, task, current_user.id)
-    #   old_list_id = task.list_id
-    #   if old_list_id != payload.new_list_id:
-    #       # Re-index source list: close the gap left by the moved task
-    #       db.query(Task).filter(Task.list_id == old_list_id,
-    #                             Task.position > task.position) \
-    #           .update({"position": Task.position - 1})
-    #       task.list_id = payload.new_list_id
-    #   # Shift tasks at destination down to make room
-    #   db.query(Task).filter(Task.list_id == payload.new_list_id,
-    #                         Task.position >= payload.new_position) \
-    #       .update({"position": Task.position + 1})
-    #   task.position = payload.new_position
-    #   db.commit(); db.refresh(task); return task
-    raise HTTPException(status_code=501, detail="Sprint 3: not yet implemented")
+    task = get_task_or_404(db, task_id, current_user.id)
+    old_list_id = task.list_id
+
+    if old_list_id != payload.new_list_id:
+        # Close the gap in the source list by shifting tasks down
+        db.query(Task).filter(
+            Task.list_id == old_list_id,
+            Task.position > task.position
+        ).update({"position": Task.position - 1}, synchronize_session=False)
+        task.list_id = payload.new_list_id
+
+    # Make room in the destination list by shifting tasks up
+    db.query(Task).filter(
+        Task.list_id == payload.new_list_id,
+        Task.position >= payload.new_position,
+        Task.id != task_id
+    ).update({"position": Task.position + 1}, synchronize_session=False)
+
+    task.position = payload.new_position
+    db.commit()
+    db.refresh(task)
+    return task
 
 
 @router.post("/api/tasks/{task_id}/labels/{label_id}", response_model=TaskResponse)
@@ -178,21 +209,21 @@ def add_label_to_task(
 ):
     """
     Attaches an existing label to a task.
-    Frontend: call when user selects a label from the label picker in the task detail modal.
+    Member 2: call when user selects a label from the label picker in the task modal.
         After success: invalidateQueries({ queryKey: ['tasks', taskId] })
-    Label must already exist (create it via POST /api/labels/ first).
     """
-    # Sprint 2:
-    #   task = get_task_or_404(db, task_id)
-    #   verify_task_owner(db, task, current_user.id)
-    #   label = db.query(Label).filter(Label.id == label_id,
-    #                                  Label.user_id == current_user.id).first()
-    #   if not label: raise HTTPException(404, "Label not found")
-    #   if label not in task.labels:
-    #       task.labels.append(label)
-    #       db.commit(); db.refresh(task)
-    #   return task
-    raise HTTPException(status_code=501, detail="Sprint 2: not yet implemented")
+    task = get_task_or_404(db, task_id, current_user.id)
+    label = db.query(Label).filter(
+        Label.id == label_id,
+        Label.user_id == current_user.id
+    ).first()
+    if not label:
+        raise HTTPException(status_code=404, detail="Label not found")
+    if label not in task.labels:
+        task.labels.append(label)
+        db.commit()
+        db.refresh(task)
+    return task
 
 
 @router.delete("/api/tasks/{task_id}/labels/{label_id}", response_model=TaskResponse)
@@ -203,16 +234,15 @@ def remove_label_from_task(
     db: Session = Depends(get_db),
 ):
     """
-    Detaches a label from a task (does NOT delete the label itself).
-    Frontend: call when user removes a label badge from the task detail modal.
+    Detaches a label from a task. Does NOT delete the label itself.
+    Member 2: call when user removes a label badge in the task modal.
         After success: invalidateQueries({ queryKey: ['tasks', taskId] })
     """
-    # Sprint 2:
-    #   task = get_task_or_404(db, task_id)
-    #   verify_task_owner(db, task, current_user.id)
-    #   task.labels = [l for l in task.labels if l.id != label_id]
-    #   db.commit(); db.refresh(task); return task
-    raise HTTPException(status_code=501, detail="Sprint 2: not yet implemented")
+    task = get_task_or_404(db, task_id, current_user.id)
+    task.labels = [l for l in task.labels if l.id != label_id]
+    db.commit()
+    db.refresh(task)
+    return task
 
 
 @router.delete("/api/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -222,12 +252,10 @@ def delete_task(
     db: Session = Depends(get_db),
 ):
     """
-    Deletes a task. DB cascades and removes all task_labels entries automatically.
-    Frontend: call from the task detail modal's delete button (with confirmation).
+    Deletes a task. DB cascades: task_labels entries removed automatically.
+    Member 2: call from the task modal delete button (with confirmation dialog).
         After success: invalidateQueries({ queryKey: ['tasks', listId] })
     """
-    # Sprint 2:
-    #   task = get_task_or_404(db, task_id)
-    #   verify_task_owner(db, task, current_user.id)
-    #   db.delete(task); db.commit()
-    raise HTTPException(status_code=501, detail="Sprint 2: not yet implemented")
+    task = get_task_or_404(db, task_id, current_user.id)
+    db.delete(task)
+    db.commit()
