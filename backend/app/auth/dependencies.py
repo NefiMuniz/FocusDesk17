@@ -26,11 +26,11 @@
 #     Redirect user to /login (token expired or invalid)
 #
 # YOUR TASKS — Sprint 2:
-#   [ ] Create app/routers/auth.py with:
+#   [ X ] Create app/routers/auth.py with:
 #         POST /api/auth/register  → hash password, insert user, return UserResponse
 #         POST /api/auth/login     → verify password, return { access_token, token_type }
-#   [ ] Replace the PLACEHOLDER below with real JWT decoding
-#   [ ] Add app.include_router(auth.router) in main.py (comment already there)
+#   [ X ] Replace the PLACEHOLDER below with real JWT decoding
+#   [ X ] Add app.include_router(auth.router) in main.py (comment already there)
 #
 # JWT IMPLEMENTATION GUIDE:
 #   from jose import jwt, JWTError
@@ -46,78 +46,41 @@
 #     get_password_hash(plain_password)
 # ============================================================
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.database import get_db
 from app.models import User
+from app.auth.security import SECRET_KEY, ALGORITHM
 import uuid
 
-# auto_error=False means Swagger won't block requests that have no token at all.
-# Any endpoint using Depends(get_current_user) is freely testable without authorization.
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
-
-# Fixed dev user UUID — used as the owner for all resources created during testing.
-DEV_USER_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
-
+# This scheme tells FastAPI to look for the 'Authorization: Bearer <token>' header.
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 def get_current_user(
-    token: Optional[str] = Depends(oauth2_scheme),
+    token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db),
 ) -> User:
-    """
-    Returns the authenticated User for the current request.
+   # Returns the authenticated User for the current request.
 
-    ⚠️  oAuth: Replace the PLACEHOLDER BLOCK below with real JWT decoding
-        once login is implemented. The template is in the comment above.
+   credentials_exception = HTTPException(
+      status_code=status.HTTP_401_UNAUTHORIZED,
+      detail= "Could not validate credentials",
+      headers={"WWW-Authenticate": "Bearer"},
+   )
 
-    DEV MODE (current behaviour):
-        - No token required. All endpoints work freely in Swagger.
-        - A fixed dev user (id = 00000000-0000-0000-0000-000000000001) is
-          used as the owner for every created resource.
-        - To test user-specific data isolation later, just pass a real JWT.
+   try:
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    email: str = payload.get("sub")
 
-    Real implementation template:
-    ─────────────────────────────────────────────────────────────
-    from jose import jwt, JWTError
-    from fastapi import HTTPException, status
-    from app.config import settings
+    if email is None:
+       raise credentials_exception
 
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        user_id: str = payload.get("sub")
-        if user_id is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
+   except JWTError:
+    raise credentials_exception
 
-    user = db.query(User).filter(User.id == uuid.UUID(user_id)).first()
-    if user is None:
-        raise credentials_exception
-    return user
-    ─────────────────────────────────────────────────────────────
-    """
+   user= db.query(User).filter(User.email == email).first()
 
-    # ── PLACEHOLDER START — remove once oAuth implements real JWT ──
-    # Returns the fixed dev user so every CRUD can be tested in Swagger
-    # without needing to authorize. The dev user is created on first use
-    # if it doesn't already exist in the database.
-    dev_user = db.query(User).filter(User.id == DEV_USER_ID).first()
-    if not dev_user:
-        dev_user = User(
-            id=DEV_USER_ID,
-            email="dev@focusdesk.test",
-            name="Dev User",
-            password_hash="placeholder",
-        )
-        db.add(dev_user)
-        db.commit()
-        db.refresh(dev_user)
-    return dev_user
-    # ── PLACEHOLDER END ──
+   return user
