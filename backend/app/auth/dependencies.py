@@ -35,42 +35,53 @@
 # JWT IMPLEMENTATION GUIDE:
 #   from jose import jwt, JWTError
 #   from app.config import settings
-#   from passlib.hash import bcrypt
 #
 #   Create token:
 #     jwt.encode({"sub": str(user.id), "exp": expiry}, settings.SECRET_KEY, settings.ALGORITHM)
 #
 #   Verify password:
-#     bcrypt.verify(plain_password, user.password_hash)
+#     verify_password(plain_password, user.password_hash)
 #
 #   Hash password:
-#     bcrypt.hash(plain_password)
+#     get_password_hash(plain_password)
 # ============================================================
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
+from typing import Optional
 from app.database import get_db
 from app.models import User
 import uuid
 
-# Reads the JWT from: Authorization: Bearer <token>
-# tokenUrl is the login endpoint — oAuth creates this in app/routers/auth.py
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+# auto_error=False means Swagger won't block requests that have no token at all.
+# Any endpoint using Depends(get_current_user) is freely testable without authorization.
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
+
+# Fixed dev user UUID — used as the owner for all resources created during testing.
+DEV_USER_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
 
 
 def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    token: Optional[str] = Depends(oauth2_scheme),
     db: Session = Depends(get_db),
 ) -> User:
     """
     Returns the authenticated User for the current request.
 
-    ⚠️ oAuth: Replace the PLACEHOLDER BLOCK with real JWT decoding.
+    ⚠️  oAuth: Replace the PLACEHOLDER BLOCK below with real JWT decoding
+        once login is implemented. The template is in the comment above.
+
+    DEV MODE (current behaviour):
+        - No token required. All endpoints work freely in Swagger.
+        - A fixed dev user (id = 00000000-0000-0000-0000-000000000001) is
+          used as the owner for every created resource.
+        - To test user-specific data isolation later, just pass a real JWT.
 
     Real implementation template:
     ─────────────────────────────────────────────────────────────
     from jose import jwt, JWTError
+    from fastapi import HTTPException, status
     from app.config import settings
 
     credentials_exception = HTTPException(
@@ -94,13 +105,19 @@ def get_current_user(
     """
 
     # ── PLACEHOLDER START — remove once oAuth implements real JWT ──
-    # Returns a fake user so other members can test routes without a real token.
-    # To test: pass any non-empty string as Bearer token in Swagger (/docs).
-    fake_user = User(
-        id=uuid.UUID("00000000-0000-0000-0000-000000000001"),
-        email="dev@focusdesk.test",
-        name="Dev User",
-        password_hash="placeholder",
-    )
-    return fake_user
+    # Returns the fixed dev user so every CRUD can be tested in Swagger
+    # without needing to authorize. The dev user is created on first use
+    # if it doesn't already exist in the database.
+    dev_user = db.query(User).filter(User.id == DEV_USER_ID).first()
+    if not dev_user:
+        dev_user = User(
+            id=DEV_USER_ID,
+            email="dev@focusdesk.test",
+            name="Dev User",
+            password_hash="placeholder",
+        )
+        db.add(dev_user)
+        db.commit()
+        db.refresh(dev_user)
+    return dev_user
     # ── PLACEHOLDER END ──
