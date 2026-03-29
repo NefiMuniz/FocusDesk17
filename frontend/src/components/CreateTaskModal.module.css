@@ -1,0 +1,171 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+  }
+  
+  .modalBorder {
+    background: linear-gradient(to right, #118AB2, #06D6A0);
+    border-radius: 0.8rem;
+    padding: 3px;
+    width: 90%;
+    max-width: 32rem;
+  }
+  
+  .modal {
+    background: linear-gradient(135deg, #cdffd8, #94b9ff);
+    border-radius: 0.6rem;
+    padding: 2rem;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 0 0 2px rgba(6, 214, 160, 0.3);
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .title {
+    font-family: "Sniglet", sans-serif;
+    background: linear-gradient(to right, #118AB2, #06D6A0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 1.5rem;
+  }
+  
+  .closeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #07384C;
+    transition: opacity 0.2s;
+  }
+  
+  .closeButton:hover {
+    opacity: 0.7;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  
+  .form label {
+    font-family: "Poppins", sans-serif;
+    color: #07384C;
+    font-weight: 500;
+    font-size: 1rem;
+  }
+  
+  .form input,
+  .form textarea {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 2px solid #118AB2;
+    background-color: rgba(255, 255, 255, 0.5);
+    font-family: "Poppins", sans-serif;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    outline: none;
+    resize: none;
+  }
+  
+  .form input:focus,
+  .form textarea:focus {
+    border-color: #06D6A0;
+    box-shadow: 0 0 0 2px rgba(6, 214, 160, 0.3);
+  }
+  
+  .select {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 2px solid #118AB2;
+    background-color: rgba(255, 255, 255, 0.5);
+    font-family: "Poppins", sans-serif;
+    font-size: 0.8rem;
+    color: #07384C;
+    margin-bottom: 0.5rem;
+    outline: none;
+  }
+  
+  .select:focus {
+    border-color: #06D6A0;
+    box-shadow: 0 0 0 2px rgba(6, 214, 160, 0.3);
+  }
+  
+  .select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .fieldError {
+    color: #8b0000;
+    font-family: "Poppins", sans-serif;
+    font-size: 1rem;
+    margin-top: -0.3rem;
+    margin-bottom: 0.3rem;
+  }
+  
+  .error {
+    color: #8b0000;
+    font-family: "Poppins", sans-serif;
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  
+  .cancelButton {
+    padding: 0.3rem 1rem;
+    border-radius: 0.5rem;
+    border: 2px solid #118AB2;
+    background: none;
+    font-family: "Poppins", sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #07384C;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  
+  .cancelButton:hover {
+    opacity: 0.75;
+  }
+  
+  .submitButton {
+    padding: 0.3rem 1rem;
+    border-radius: 0.5rem;
+    border: 2px solid #118AB2;
+    background: linear-gradient(135deg, #cdffd8, #94b9ff);
+    font-family: "Poppins", sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #07384C;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  
+  .submitButton:hover {
+    opacity: 0.85;
+  }
+  
+  .submitButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }

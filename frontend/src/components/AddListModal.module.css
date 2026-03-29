@@ -1,0 +1,131 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modalBorder {
+    background: linear-gradient(to right, #118AB2, #06D6A0);
+    border-radius: 1.7rem;
+    padding: 3px;
+    width: 90%;
+    max-width: 28rem;
+}
+
+.modal {
+    background: linear-gradient(135deg, #cdffd8, #94b9ff);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    width: 100%;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.title {
+    font-family: "Sniglet", sans-serif;
+    background: linear-gradient(to right, #118AB2, #06D6A0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 1.5rem;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #07384C;
+    transition: opacity 0.2s;
+}
+
+.closeButton:hover {
+    opacity: 0.7;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form label {
+    font-family: "Poppins", sans-serif;
+    color: #07384C;
+    font-weight: 500;
+}
+
+.form input {
+padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+    border: 2px solid #118AB2;
+    background-color: rgba(255, 255, 255, 0.5);
+    font-family: "Poppins", sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.form input:focus {
+    border-color: #06D6A0;
+    box-shadow: 0 0 0 2px rgba(6, 214, 160, 0.3);
+}
+
+.fieldError {
+    color: #8b0000;
+    font-family: "Poppins", sans-serif;
+    font-size: 0.85rem;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.cancelButton {
+    padding: 0.5rem 1.2rem;
+    border-radius: 0.5rem;
+    border: 2px solid #118AB2;
+    background: none;
+    font-family: "Poppins", sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #07384C;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.cancelButton:hover {
+    opacity: 0.75;
+}
+
+.submitButton {
+    padding: 0.5rem 1.2rem;
+    border-radius: 0.5rem;
+    border: 2px solid #118AB2;
+    background: linear-gradient(135deg, #cdffd8, #94b9ff);
+    font-family: "Poppins", sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #07384C;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.submitButton:hover {
+    opacity: 0.85;
+}
+
+.submitButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

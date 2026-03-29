@@ -1,0 +1,219 @@
+.overlay {
+position: fixed;
+inset: 0;
+background-color: rgba(0, 0, 0, 0.7);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 100;
+}
+
+.modalBorder {
+background: linear-gradient(to right, #118AB2, #06D6A0);
+border-radius: 1.7rem;
+padding: 3px;
+width: 90%;
+max-width: 35rem;
+}
+
+.modal {
+background: linear-gradient(135deg, #cdffd8, #94b9ff);
+border-radius: 1.5rem;
+padding: 2rem;
+width: 100%;
+display: flex;
+flex-direction: column;
+gap: 1.2rem;
+}
+
+.header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 1rem;
+}
+
+.title {
+font-family: "Sniglet", sans-serif;
+color: #07384C;
+font-size: 1.5rem;
+}
+
+.titleInput {
+font-family: "Sniglet", sans-serif;
+font-size: 1.5rem;
+color: #07384C;
+border: 2px solid #118AB2;
+border-radius: 0.5rem;
+padding: 0.3rem 0.6rem;
+background: rgba(255, 255, 255, 0.5);
+width: 100%;
+outline: none;
+}
+
+.closeButton {
+background: none;
+border: none;
+cursor: pointer;
+color: #07384C;
+flex-shrink: 0;
+transition: opacity 0.2s;
+}
+
+.closeButton:hover {
+opacity: 0.7;
+}
+
+.fields {
+display: flex;
+flex-direction: column;
+gap: 0.8rem;
+}
+
+.field {
+display: flex;
+align-items: center;
+gap: 1rem;
+}
+
+.field label {
+font-family: "Poppins", sans-serif;
+font-weight: 600;
+color: #07384C;
+min-width: 5rem;
+font-size: 0.9rem;
+}
+
+.fieldValue {
+font-family: "Poppins", sans-serif;
+color: #07384C;
+font-size: 0.9rem;
+}
+
+.select,
+.input {
+padding: 0.4rem 0.8rem;
+border-radius: 0.5rem;
+border: 2px solid #118AB2;
+background: rgba(255, 255, 255, 0.5);
+font-family: "Poppins", sans-serif;
+font-size: 0.9rem;
+color: #07384C;
+outline: none;
+}
+
+.select:focus,
+.input:focus {
+border-color: #06D6A0;
+}
+
+.labels {
+display: flex;
+gap: 0.5rem;
+flex-wrap: wrap;
+}
+
+.labelBadge {
+padding: 0.2rem 0.6rem;
+border-radius: 1rem;
+font-family: "Poppins", sans-serif;
+font-size: 0.75rem;
+font-weight: 600;
+color: #fff;
+}
+
+.descriptionSection {
+display: flex;
+flex-direction: column;
+gap: 0.5rem;
+}
+
+.descriptionSection label {
+font-family: "Poppins", sans-serif;
+font-weight: 600;
+color: #07384C;
+font-size: 0.9rem;
+}
+
+.descriptionText {
+font-family: "Poppins", sans-serif;
+color: #07384C;
+font-size: 0.9rem;
+line-height: 1.6;
+background: rgba(255, 255, 255, 0.4);
+border-radius: 0.5rem;
+padding: 0.8rem;
+min-height: 5rem;
+}
+
+.textarea {
+padding: 0.8rem;
+border-radius: 0.5rem;
+border: 2px solid #118AB2;
+background: rgba(255, 255, 255, 0.5);
+font-family: "Poppins", sans-serif;
+font-size: 0.9rem;
+color: #07384C;
+outline: none;
+resize: none;
+width: 100%;
+}
+
+.textarea:focus {
+border-color: #06D6A0;
+box-shadow: 0 0 0 2px rgba(6, 214, 160, 0.3);
+}
+
+.footer {
+display: flex;
+justify-content: flex-end;
+gap: 0.8rem;
+}
+
+.editButton,
+.saveButton,
+.deleteButton {
+display: flex;
+align-items: center;
+gap: 0.4rem;
+padding: 0.5rem 1.2rem;
+border-radius: 0.5rem;
+font-family: "Poppins", sans-serif;
+font-size: 0.9rem;
+font-weight: 600;
+cursor: pointer;
+transition: opacity 0.2s;
+}
+
+.editButton,
+.saveButton {
+border: 2px solid #118AB2;
+background: linear-gradient(135deg, #cdffd8, #94b9ff);
+color: #07384C;
+}
+
+.deleteButton {
+border: 2px solid #EF476F;
+background: none;
+color: #EF476F;
+}
+
+.editButton:hover,
+.saveButton:hover,
+.deleteButton:hover {
+opacity: 0.8;
+}
+
+.editButton:disabled,
+.saveButton:disabled,
+.deleteButton:disabled {
+opacity: 0.5;
+cursor: not-allowed;
+}
+
+.error {
+color: #8b0000;
+font-family: "Poppins", sans-serif;
+font-size: 0.9rem;
+text-align: center;
+}
