@@ -2,14 +2,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 80vh;
+    min-height: 60vh;
     padding: 3rem 0;
     
 }
 
 .cardBorder {
     background: linear-gradient(to right, #118AB2, #06D6A0);
-    border-radius: 1.7rem;
+    border-radius: 0.8rem;
     padding: 3px;
     width: 100%;
     transition: transform 0.3s ease;
@@ -22,7 +22,7 @@
   
 .card {
     background: linear-gradient(135deg, #cdffd8, #94b9ff);
-    border-radius: 1.5rem;
+    border-radius: 0.6rem;
     padding: 2.5rem;
     width: 100%;
     position: relative;
@@ -52,7 +52,7 @@
 .form {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.3rem;
 }
   
 .form label {
@@ -63,14 +63,14 @@
 }
   
 .form input {
-padding: 0.75rem 1rem;
-border-radius: 0.5rem;
-border: 2px solid #118AB2;
-background-color: rgba(255, 255, 255, 0.5);
-font-family: "Poppins", sans-serif;
-font-size: 1rem;
-margin-bottom: 0.5rem;
-outline: none;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 2px solid #118AB2;
+    background-color: rgba(255, 255, 255, 0.5);
+    font-family: "Poppins", sans-serif;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    outline: none;
 }
 
 .form input:focus {
@@ -80,28 +80,29 @@ outline: none;
 }
 
 .button {
-padding: 0.75rem;
-border-radius: 0.5rem;
-border: 2px solid #118AB2;
-background: linear-gradient(135deg, #cdffd8, #94b9ff);
-font-family: "Poppins", sans-serif;
-font-size: 1rem;
-font-weight: 600;
-color: #07384C;
-cursor: pointer;
-margin-top: 0.5rem;
-transition: opacity 0.2s;
+    padding: 0.3rem;
+    border-radius: 0.5rem;
+    border: 2px solid #118AB2;
+    background: linear-gradient(135deg, #cdffd8, #94b9ff);
+    font-family: "Poppins", sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #07384C;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: opacity 0.2s;
 }
 
 .button:hover {
-opacity: 0.85;
+    opacity: 0.85;
 }
 
 .switch {
-text-align: center;
-font-family: "Poppins", sans-serif;
-color: #07384C;
-margin-top: 0.5rem;
+    text-align: center;
+    font-family: "Poppins", sans-serif;
+    color: #07384C;
+    margin-top: 0.5rem;
+    font-size: .8rem;
 }
 
 .switchLink {
@@ -112,7 +113,7 @@ margin-top: 0.5rem;
     background: none;
     border: none;
     font-family: "Poppins", sans-serif;
-    font-size: 1rem;
+    font-size: 0.8rem;
     padding: 0;
 }
 
@@ -124,7 +125,7 @@ margin-top: 0.5rem;
     margin-bottom: 0.5rem;
 }
   
-  .fieldError {
+.fieldError {
     color: #8b0000;
     font-family: "Poppins", sans-serif;
     font-size: 1rem;

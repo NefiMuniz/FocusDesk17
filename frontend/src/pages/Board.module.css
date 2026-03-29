@@ -1,0 +1,335 @@
+.container {
+    padding: 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-height: 80vh;
+}
+
+.buttonRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+}
+
+.titleRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.title {
+    font-family: "Sniglet", sans-serif;
+    background: linear-gradient(to right, #118AB2, #06D6A0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2rem;
+    text-align: center;
+    grid-column: 2;
+    margin: auto;
+}
+
+.deleteButton{
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    border: 2px solid #EF476F;
+    background: none;
+    color: #EF476F;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+    margin: 0 0.3rem;
+}
+
+.buttonRowLeft {
+    display: flex;
+    align-items: center;
+}
+
+.buttonRowRight {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.addTaskButton {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 1rem;
+    border-radius: 0.5rem;
+    border: 2px solid #118AB2;
+    background: linear-gradient(135deg, #cdffd8, #94b9ff);
+    font-family: "Poppins", sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #07384C;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.addTaskButton:hover { 
+    opacity: 0.85; 
+}
+
+.addTaskButton:disabled { 
+    opacity: 0.4; cursor: not-allowed; 
+}
+
+.editButton {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 1rem;
+    border-radius: 0.5rem;
+    border: 2px solid #118AB2;
+    background: linear-gradient(135deg, #cdffd8, #94b9ff);
+    font-family: "Poppins", sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #07384C;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.editButton:hover { 
+    opacity: 0.85; 
+}
+
+.searchBar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border-radius: 0.5rem;
+    border: 2px solid #118AB2;
+    background-color: #EEF5F8;
+    width: 100%;
+    max-width: 28rem;
+    margin: 0 auto;
+}
+
+.searchBar input {
+    border: none;
+    background: none;
+    outline: none;
+    font-family: "Poppins", sans-serif;
+    font-size: 0.85rem;
+    color: #07384C;
+    width: 100%;
+}
+
+.searchBar input::placeholder {
+    color: #07384C;
+    opacity: 0.5;
+}
+
+.searchIcon {
+    color: #07384C;
+    opacity: 0.5;
+    flex-shrink: 0;
+}
+
+.emptyState {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.cardBorder {
+    background: linear-gradient(to right, #118AB2, #06D6A0);
+    border-radius: 1.7rem;
+    padding: 3px;
+}
+
+.emptyCard {
+    background: linear-gradient(135deg, #cdffd8, #94b9ff);
+    border-radius: 1.5rem;
+    padding: 2rem 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.emptyMessage {
+    font-family: "Poppins", sans-serif;
+    color: #07384C;
+    font-size: 1rem;
+}
+
+.createListButton {
+    padding: 0.4rem 1.5rem;
+    border-radius: 0.5rem;
+    border: 2px solid #118AB2;
+    background: linear-gradient(135deg, #cdffd8, #94b9ff);
+    font-family: "Poppins", sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #07384C;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.createListButton:hover { 
+    opacity: 0.85; 
+}
+
+.listsContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+}
+
+.listWrapper {
+    display: flex;
+    align-items: center;
+}
+
+.listColumn {
+    width: 280px;
+    min-width: 280px;
+    background: #EEF5F8;
+    border-radius: 0.8rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    border: 2px solid #06D6A0;
+    min-height: 65vh;
+}
+
+.listHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(17, 138, 178, 0.2);
+}
+
+.listName {
+    font-family: "Sniglet", sans-serif;
+    color: #07384C;
+    font-size: 1.1rem;
+}
+
+.listOptionsButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #07384C;
+    opacity: 0.6;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.2s;
+}
+
+.listOptionsButton:hover { opacity: 1; }
+
+.taskList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.listFooter {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(17, 138, 178, 0.2);
+}
+
+.listFooterButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #07384C;
+    opacity: 0.6;
+    display: flex;
+    align-items: center;
+    padding: 0.2rem;
+    border-radius: 0.3rem;
+    transition: opacity 0.2s;
+}
+
+.listFooterButton:hover { 
+    opacity: 1; 
+}
+
+.addListButton {
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    border: 2px solid #06D6A0;
+    background: none;
+    color: #06D6A0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+    margin: 0 0.3rem;
+}
+
+.addListButton:hover { 
+    opacity: 0.7; 
+}
+
+.bottomSection {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.labelsLegend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.8rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 0.8rem;
+    border: 2px solid #06D6A0;
+    width: fit-content;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.legendColor {
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.legendName {
+    font-family: "Poppins", sans-serif;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+}
+
+.message {
+    font-family: "Poppins", sans-serif;
+    color: var(--text-primary);
+    text-align: center;
+    padding: 2rem;
+}
+
+.listFooterButton:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
