@@ -1,3 +1,6 @@
+from fastapi.testclient import TestClient
+from app.main import app
+import uuid
 from app.database import SessionLocal
 from app.models import User
 from app.auth.security import get_password_hash, verify_password, create_access_token, SECRET_KEY, ALGORITHM
@@ -9,6 +12,53 @@ load_dotenv()
 
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+
+
+client = TestClient(app)
+
+
+def generate_unique_user():
+    unique_id = uuid.uuid4().hex[:8]
+    return {
+        "email": f"user_{unique_id}@test.com",
+        "password": "Test1234!",
+        "name": "Test User"
+    }
+
+
+def test_register_user_success():
+    payload = generate_unique_user()
+    
+    response = client.post("/api/auth/register", json=payload)
+
+    assert response.status_code == 201
+    data = response.json()
+
+    assert data["email"] == payload["email"]
+    assert "id" in data
+
+
+def test_login_after_register():
+    payload = generate_unique_user()
+
+    # Register
+    register_response = client.post("/api/auth/register", json=payload)
+    assert register_response.status_code == 201
+
+    # Login (form-data)
+    login_data = {
+        "username": payload["email"],
+        "password": payload["password"]
+    }
+
+    response = client.post("/api/auth/login", data=login_data)
+
+    assert response.status_code == 200
+
+    data = response.json()
+    assert "access_token" in data
+    assert data["token_type"] == "bearer"
 
 def test_get_password_hash_returns_hashed_value():
     password = "mypassword123"
@@ -38,31 +88,24 @@ def test_create_access_token_contains_sub():
 
 
 
+
 def test_login_real_user():
+    payload = generate_unique_user()
+
+    # Register user
+    register_response = client.post("/api/auth/register", json=payload)
+    assert register_response.status_code == 201
+
     db = SessionLocal()
 
-    email = "perico@entel.cl"
-    password = "Secret@123"
+    user = db.query(User).filter(User.email == payload["email"]).first()
 
-    # Find real user in database
-    user = db.query(User).filter(User.email == email).first()
+    assert user is not None
 
-    assert user is not None, "User does not exist in DB"
+    assert verify_password(payload["password"], user.password_hash)
 
-    # Check real password
-    assert verify_password(password, user.password_hash), "Wrong password"
-
-    # Create token
     token = create_access_token({"sub": user.email})
-
     assert token is not None
 
-    # Decode JWT
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-
-    assert payload["sub"] == email
-    assert "exp" in payload
-
     db.close()
-
 
