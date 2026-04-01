@@ -4,14 +4,7 @@ import uuid
 
 client = TestClient(app)
 
-def test_access_without_token():
-    res = client.get("/api/boards/")
-    assert res.status_code == 401
-
-# =========================
-# 🔐 HELPERS
-# =========================
-
+# HELPERS
 def create_user_and_token():
     unique_id = uuid.uuid4().hex[:8]
     payload = {
@@ -33,8 +26,9 @@ def create_user_and_token():
         "headers": {"Authorization": f"Bearer {token}"}
     }
 
+
 # =========================
-# 📌 BOARDS
+# BOARDS
 # =========================
 
 def test_create_and_get_boards():
@@ -91,7 +85,7 @@ def test_delete_board():
     assert res.status_code == 204
 
 # =========================
-# 📌 LABELS
+# LABELS
 # =========================
 
 def test_create_and_get_labels():
@@ -131,7 +125,7 @@ def test_delete_label():
     assert res.status_code == 204
 
 # =========================
-# 📌 LISTS
+# LISTS
 # =========================
 
 def create_board(auth):
@@ -191,7 +185,7 @@ def test_delete_list():
     assert res.status_code == 204
 
 # =========================
-# 📌 TASKS
+# TASKS
 # =========================
 
 def create_list(auth):
@@ -276,7 +270,7 @@ def test_reorder_task():
     assert res.status_code == 200
 
 # =========================
-# 🔒 SECURITY TEST
+#  SECURITY TEST
 # =========================
 
 def test_access_without_token():
