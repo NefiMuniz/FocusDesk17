@@ -16,7 +16,7 @@ class UserBase(BaseModel):
         min_length=2,
         max_length=80,
         pattern=r"^[a-zA-Z\s]*$",
-        description="Full name — letters and spaces only, 2–80 characters.",
+        description="Full name — letters and spaces only, 2-80 characters.",
         examples=["John Doe"]
     )
 
@@ -26,12 +26,11 @@ class UserCreate(UserBase):
     POST /api/auth/register — request body.
 
     Password rules:
-    - Minimum 8 characters
+    - 8-72 characters
     - At least one uppercase letter
     - At least one number
     - At least one special character: @$!%*?&
     - No spaces
-    - Maximum 72 characters (bcrypt limit)
     """
     model_config = ConfigDict(
         json_schema_extra={
@@ -47,7 +46,7 @@ class UserCreate(UserBase):
         ...,
         min_length=8,
         max_length=72,
-        description="8–72 chars, must include uppercase, number, and special char (@$!%*?&). No spaces.",
+        description="8-72 chars, must include uppercase, number, and special char (@$!%*?&). No spaces.",
         examples=["Secret@123"]
     )
 
@@ -69,12 +68,46 @@ class UserCreate(UserBase):
             raise ValueError("Password must contain at least one special character (@$!%*?&).")
         return v
 
+class UserUpdate(BaseModel):
+    """
+    PATCH /api/auth/me — request body.
+    All fields optional — only send what changed.
+    """
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "name": "Jane Doe",
+                "email": "jane.doe@example.com",
+            }
+        }
+    )
+
+    email: Optional[EmailStr] = Field(
+        None,
+        description="New email address. Must be unique across all accounts.",
+        examples=["jane.doe@example.com"],
+    )
+    name: Optional[str] = Field(
+        None,
+        min_length=2,
+        max_length=80,
+        pattern=r"^[a-zA-Z\s]*$",
+        description="Full name — letters and spaces only, 2–80 characters.",
+        examples=["Jane Doe"],
+    )
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, v: Optional[str]) -> Optional[str]:
+        if v:
+            return v.lower().strip()
+        return v
 
 class UserResponse(BaseModel):
     """
-    Safe user object returned after register.
+    Safe user object returned by register, login/me, and profile update.
     password_hash is NEVER included here.
-    Frontend: store this in your auth context after successful register/login.
+    Frontend: store this in your auth context.
     """
     model_config = ConfigDict(from_attributes=True)
 
@@ -83,3 +116,12 @@ class UserResponse(BaseModel):
     name: Optional[str]
     created_at: datetime
     updated_at: datetime
+
+class LoginResponse(BaseModel):
+    """
+    POST /api/auth/login — response body.
+    Frontend: store access_token in localStorage immediately.
+        localStorage.setItem('token', data.access_token)
+    """
+    access_token: str
+    token_type: str = "bearer"
