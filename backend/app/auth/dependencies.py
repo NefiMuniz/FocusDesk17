@@ -1,49 +1,21 @@
 # ============================================================
-# oAuth — THIS IS YOUR PRIMARY FILE
-# ============================================================
+# get_current_user — FastAPI dependency used by every protected route.
 #
-# `get_current_user` is a FastAPI dependency used by EVERY
-# protected route to identify who is making the request.
-#
-# HOW IT WORKS (once you implement it):
+# HOW IT WORKS:
 #   1. Frontend sends:  Authorization: Bearer <jwt_token>
-#   2. This function decodes the JWT, extracts user_id from
-#      the "sub" claim, queries the DB, returns the User.
-#   3. If invalid/expired → raise HTTP 401 automatically.
+#   2. This function decodes the JWT, extracts user_id from "sub",
+#      queries the DB, and returns the full User object.
+#   3. If token is missing, invalid, or expired → HTTP 401 automatically.
 #
-# USAGE BY CRUD MEMBER (already wired in all routers):
-#   current_user: User = Depends(get_current_user)
-#   → gives you the full User object for that request
-#
-# FRONTEND CONTRACT — Member 2 needs to follow this:
+# FRONTEND CONTRACT:
 #   After POST /api/auth/login succeeds:
 #     localStorage.setItem('token', data.access_token)
-#   Every API request must include:
+#   Every protected API request must include:
 #     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
 #   On logout:
 #     localStorage.removeItem('token') → redirect to /login
 #   If any API call returns 401:
 #     Redirect user to /login (token expired or invalid)
-#
-# YOUR TASKS — Sprint 2:
-#   [ X ] Create app/routers/auth.py with:
-#         POST /api/auth/register  → hash password, insert user, return UserResponse
-#         POST /api/auth/login     → verify password, return { access_token, token_type }
-#   [ X ] Replace the PLACEHOLDER below with real JWT decoding
-#   [ X ] Add app.include_router(auth.router) in main.py (comment already there)
-#
-# JWT IMPLEMENTATION GUIDE:
-#   from jose import jwt, JWTError
-#   from app.config import settings
-#
-#   Create token:
-#     jwt.encode({"sub": str(user.id), "exp": expiry}, settings.SECRET_KEY, settings.ALGORITHM)
-#
-#   Verify password:
-#     verify_password(plain_password, user.password_hash)
-#
-#   Hash password:
-#     get_password_hash(plain_password)
 # ============================================================
 
 from fastapi import Depends, HTTPException, status
