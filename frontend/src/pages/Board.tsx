@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Search, Pencil, Trash2, GripVertical } from "lucide-react";
+import { CirclePlus, ListPlus, Search, Pencil, Trash2, Grip } from "lucide-react";
 import styles from "./Board.module.css";
 import { getBoard, deleteBoard } from "../api/boards";
 import { getLists, deleteList } from "../api/lists";
@@ -11,6 +11,7 @@ import TaskCard from "../components/TaskCard";
 import AddListModal from "../components/AddListModal";
 import CreateTaskModal from "../components/CreateTaskModal";
 import { useNavigate } from "react-router-dom";
+import EditBoardModal from "../components/EditBoardModal";
 
 const Board = () => {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +20,7 @@ const Board = () => {
   const [isAddListModalOpen, setIsAddListModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [isEditBoardModalOpen, setIsEditBoardModalOpen] = useState(false);
 
   const { data: board, isLoading: boardLoading, isError: boardError } = useQuery<BoardType>({
     queryKey: ["boards", id],
@@ -117,15 +119,18 @@ const Board = () => {
             disabled={lists.length === 0}
             aria-label="Add new task"
           >
-            <Plus size={16} />
+            <CirclePlus size={16} />
             Add Task
           </button>
         </div>
 
         <div className={styles.buttonRowRight}>
-          <button className={styles.editButton} aria-label="Edit board">
-            Edit Board
-          </button>
+        <button className={styles.editButton} 
+        onClick={() => setIsEditBoardModalOpen(true)} 
+        aria-label="Edit board">
+          <Pencil size={16} />
+          Edit Board
+        </button>
         </div>
       </div>
 
@@ -138,6 +143,7 @@ const Board = () => {
                 className={styles.createListButton}
                 onClick={() => setIsAddListModalOpen(true)}
               >
+                <ListPlus size={16} />
                 Create List
               </button>
             </div>
@@ -151,7 +157,7 @@ const Board = () => {
                 <div className={styles.listHeader}>
                   <h2 className={styles.listName}>{list.name}</h2>
                   <button className={styles.listOptionsButton} aria-label="List options">
-                    <GripVertical size={18} />
+                    <Grip size={18} />
                   </button>
                 </div>
                 <div className={styles.taskList}>
@@ -162,7 +168,7 @@ const Board = () => {
                     <Pencil size={16} />
                   </button>
                   <button 
-                  className={styles.listFooterButton} 
+                  className={styles.deleteButtonFooter} 
                   aria-label="Delete list"
                   onClick={() => handleDeleteList(list)}
                   disabled={list.tasks && list.tasks.length > 0}>
@@ -175,7 +181,7 @@ const Board = () => {
                 onClick={() => setIsAddListModalOpen(true)}
                 aria-label="Add new list"
               >
-                <Plus size={14} />
+                <ListPlus size={20} />
               </button>
             </div>
           ))}
@@ -206,6 +212,12 @@ const Board = () => {
         <CreateTaskModal
           onClose={() => setIsTaskModalOpen(false)}
           preselectedBoardId={id}
+        />
+      )}
+      {isEditBoardModalOpen && board && (
+        <EditBoardModal
+          board={board}
+          onClose={() => setIsEditBoardModalOpen(false)}
         />
       )}
     </div>

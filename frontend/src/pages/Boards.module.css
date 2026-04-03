@@ -137,7 +137,7 @@ font-style: italic;
 }
 
 .error {
-color: #EF476F;
+color: var(--dark-red);
 font-weight:1000;
 font-family: "Poppins", sans-serif;
 font-size: 1rem;
@@ -168,7 +168,7 @@ background-color: rgba(6, 214, 160, 0.15);
 }
 
 .iconOverdue {
-color: #EF476F;
+color: var(--dark-red);
 flex-shrink: 0;
 }
 

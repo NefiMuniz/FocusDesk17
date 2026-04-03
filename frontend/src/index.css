@@ -12,6 +12,9 @@
   --text-primary: #EEF5FB;
   --text-nav: #EEF5FB;
   --padding-nav:0.01rem 3rem;
+  --rounded-button: #06D6A0;
+  --dark-red: #8b0000;
+  --light-red: #EF476F;
 }
 
 :root[data-theme="light"] {
@@ -20,6 +23,9 @@
   --text-primary: #07384C;
   --text-nav: #07384C;
   --padding-nav:0.5rem 3rem;
+  --rounded-button: #118AB2;
+  --dark-red: #8b0000;
+  --light-red: #EF476F;
 }
 
 body {

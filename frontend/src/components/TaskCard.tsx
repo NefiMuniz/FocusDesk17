@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import styles from "./TaskCard.module.css";
 import { getTasks } from "../api/tasks";
 import { Task } from "../types";
@@ -68,7 +68,7 @@ const TaskCard = ({ listId, searchQuery }: TaskCardProps) => {
               <Pencil size={16} />
             </button>
             <button
-              className={styles.iconButton}
+              className={styles.iconButtonDelete}
               aria-label="Delete task"
               onClick={(e) => e.stopPropagation()}
             >
@@ -77,11 +77,6 @@ const TaskCard = ({ listId, searchQuery }: TaskCardProps) => {
           </div>
         </div>
       ))}
-
-      <button className={styles.addTaskButton} aria-label="Add new task">
-        <Plus size={18} />
-        Add Task
-      </button>
 
       {selectedTask && (
         <TaskDetailModal

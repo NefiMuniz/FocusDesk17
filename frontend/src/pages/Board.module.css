@@ -32,12 +32,12 @@
 }
 
 .deleteButton{
-    width: 1.8rem;
-    height: 1.8rem;
+    width: 2rem;
+    height: 2rem;
     border-radius: 50%;
-    border: 2px solid #EF476F;
+    border: 2px solid var(--light-red);
     background: none;
-    color: #EF476F;
+    color: var(--light-red);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -165,6 +165,9 @@
 }
 
 .createListButton {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
     padding: 0.4rem 1.5rem;
     border-radius: 0.5rem;
     border: 2px solid #118AB2;
@@ -217,7 +220,7 @@
 
 .listName {
     font-family: "Sniglet", sans-serif;
-    color: #07384C;
+    color: #118AB2;
     font-size: 1.1rem;
 }
 
@@ -232,7 +235,9 @@
     transition: opacity 0.2s;
 }
 
-.listOptionsButton:hover { opacity: 1; }
+.listOptionsButton:hover { 
+    opacity: 1; 
+}
 
 .taskList {
     display: flex;
@@ -254,25 +259,43 @@
     border: none;
     cursor: pointer;
     color: #07384C;
+    font-weight: 700;
     opacity: 0.6;
     display: flex;
     align-items: center;
     padding: 0.2rem;
     border-radius: 0.3rem;
-    transition: opacity 0.2s;
+    transition: opacity 0.5s;
 }
 
 .listFooterButton:hover { 
     opacity: 1; 
 }
 
-.addListButton {
-    width: 1.8rem;
-    height: 1.8rem;
-    border-radius: 50%;
-    border: 2px solid #06D6A0;
+.deleteButtonFooter{
+    border: none;
     background: none;
-    color: #06D6A0;
+    color: var(--light-red);
+    cursor: pointer;
+    opacity: 0.6;
+    display: flex;
+    align-items: center;
+    padding: 0.2rem;
+    border-radius: 0.3rem;
+    transition: opacity 0.5s;
+}
+
+.deleteButtonFooter:hover { 
+    opacity: 1; 
+}
+
+.addListButton {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 2px solid var(--rounded-button);
+    background: none;
+    color: var(--rounded-button);
     cursor: pointer;
     display: flex;
     align-items: center;

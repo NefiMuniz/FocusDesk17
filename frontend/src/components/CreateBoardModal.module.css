@@ -38,13 +38,13 @@
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
 }
 
 .subtitle {
     font-family: "Poppins", sans-serif;
     color: #07384C;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     margin-top: 0.2rem;
 }
 
@@ -65,7 +65,7 @@
 .form {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.3rem;
 }
 
 .form label {
@@ -77,12 +77,12 @@
 
 .form input,
 .form textarea {
-    padding: 0.6rem 1rem;
+    padding: 0.5rem;
     border-radius: 0.5rem;
     border: 2px solid #118AB2;
     background-color: rgba(255, 255, 255, 0.5);
     font-family: "Poppins", sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     margin-bottom: 0.3rem;
     outline: none;
     resize: none;
@@ -117,14 +117,14 @@
 }
 
 .cancelButton {
-    padding: 0.6rem 1.5rem;
+    padding: 0.3rem 1rem;
     border-radius: 0.5rem;
-    border: 2px solid #118AB2;
+    border: 2px solid var(--dark-red);
     background: none;
     font-family: "Poppins", sans-serif;
     font-size: 1rem;
     font-weight: 600;
-    color: #07384C;
+    color: var(--dark-red);
     cursor: pointer;
     transition: opacity 0.2s;
 }

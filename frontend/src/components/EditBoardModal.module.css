@@ -6,69 +6,78 @@
     justify-content: center;
     align-items: center;
     z-index: 100;
-  }
-  
-  .modalBorder {
+}
+
+.modalBorder {
     background: linear-gradient(to right, #118AB2, #06D6A0);
     border-radius: 0.8rem;
     padding: 3px;
     width: 90%;
     max-width: 32rem;
-  }
-  
-  .modal {
+}
+
+.modal {
     background: linear-gradient(135deg, #cdffd8, #94b9ff);
     border-radius: 0.6rem;
     padding: 2rem;
     width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
+    box-shadow: 0 0 30px rgba(6, 214, 160, 0.3);
+    position: relative;
     box-shadow: 0 0 0 2px rgba(6, 214, 160, 0.3);
-  }
-  
-  .header {
+}
+
+.header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 1rem;
-  }
-  
-  .title {
+}
+
+.title {
     font-family: "Sniglet", sans-serif;
     background: linear-gradient(to right, #118AB2, #06D6A0);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     font-size: 1.5rem;
-  }
-  
-  .closeButton {
+}
+
+.subtitle {
+    font-family: "Poppins", sans-serif;
+    color: #07384C;
+    font-size: 0.8rem;
+    margin-top: 0.2rem;
+}
+
+.closeButton {
     background: none;
     border: none;
     cursor: pointer;
     color: #07384C;
+    padding: 0.2rem;
+    border-radius: 0.4rem;
     transition: opacity 0.2s;
-  }
-  
-  .closeButton:hover {
+}
+
+.closeButton:hover {
     opacity: 0.7;
-  }
-  
-  .form {
+}
+
+.form {
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
-  }
-  
-  .form label {
+}
+
+.form label {
     font-family: "Poppins", sans-serif;
     color: #07384C;
     font-weight: 500;
     font-size: 1rem;
-  }
-  
-  .form input,
-  .form textarea {
+}
+
+.form input,
+.form textarea {
     padding: 0.5rem;
     border-radius: 0.5rem;
     border: 2px solid #118AB2;
@@ -78,60 +87,38 @@
     margin-bottom: 0.5rem;
     outline: none;
     resize: none;
-  }
-  
-  .form input:focus,
-  .form textarea:focus {
+}
+
+.form input:focus,
+.form textarea:focus {
     border-color: #06D6A0;
     box-shadow: 0 0 0 2px rgba(6, 214, 160, 0.3);
-  }
-  
-  .select {
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    border: 2px solid #118AB2;
-    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.fieldError {
+    color: #8b0000;
     font-family: "Poppins", sans-serif;
-    font-size: 0.8rem;
-    color: #07384C;
-    margin-bottom: 0.5rem;
-    outline: none;
-  }
-  
-  .select:focus {
-    border-color: #06D6A0;
-    box-shadow: 0 0 0 2px rgba(6, 214, 160, 0.3);
-  }
-  
-  .select:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  
-  .fieldError {
-    color: var(--dark-red);
-    font-family: "Poppins", sans-serif;
-    font-size: 1rem;
-    margin-top: -0.3rem;
+    font-size: 0.85rem;
+    margin-top: -0.2rem;
     margin-bottom: 0.3rem;
-  }
-  
-  .error {
+}
+
+.error {
     color: var(--dark-red);
     font-family: "Poppins", sans-serif;
     font-size: 0.9rem;
     text-align: center;
     margin-bottom: 0.5rem;
-  }
-  
-  .actions {
+}
+
+.actions {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
     margin-top: 0.5rem;
-  }
-  
-  .cancelButton {
+}
+
+.cancelButton {
     padding: 0.3rem 1rem;
     border-radius: 0.5rem;
     border: 2px solid var(--dark-red);
@@ -142,13 +129,13 @@
     color: var(--dark-red);
     cursor: pointer;
     transition: opacity 0.2s;
-  }
-  
-  .cancelButton:hover {
+}
+
+.cancelButton:hover {
     opacity: 0.75;
-  }
-  
-  .submitButton {
+}
+
+.submitButton {
     padding: 0.3rem 1rem;
     border-radius: 0.5rem;
     border: 2px solid #118AB2;
@@ -159,13 +146,13 @@
     color: #07384C;
     cursor: pointer;
     transition: opacity 0.2s;
-  }
-  
-  .submitButton:hover {
+}
+
+.submitButton:hover {
     opacity: 0.85;
-  }
-  
-  .submitButton:disabled {
+}
+
+.submitButton:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-  }
+}
