@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { login, registerUser } from "../api/auth";
+import { useAuth } from "../context/AuthContext";
 import styles from "./Login.module.css";
 
 interface FormErrors {
@@ -12,6 +13,7 @@ interface FormErrors {
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const { login: authLogin } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -61,10 +63,12 @@ const Login = () => {
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+  
     if (!validateLoginForm()) return;
+  
     try {
       const response = await login(email, password);
-      localStorage.setItem("token", response.data.access_token);
+      await authLogin(response.data.access_token);
       navigate("/boards");
     } catch {
       setError("Invalid email or password. Please try again.");
