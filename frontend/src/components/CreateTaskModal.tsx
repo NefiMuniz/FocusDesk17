@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
-import { createTask } from "../api/tasks";
+import { createTask, addLabel } from "../api/tasks";
 import { getBoards } from "../api/boards";
 import { getLists } from "../api/lists";
-import { getLabels } from "../api/labels";
+import { getLabels, createLabel } from "../api/labels";
+import { Pencil } from "lucide-react";
 import { Board, TaskList, Label } from "../types";
 import styles from "./CreateTaskModal.module.css";
 
@@ -22,7 +23,9 @@ const CreateTaskModal = ({ onClose, preselectedBoardId }: CreateTaskModalProps) 
   const [selectedListId, setSelectedListId] = useState("");
   const [selectedLabelId, setSelectedLabelId] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{ title?: string; list?: string }>({});
-
+  const [newLabelName, setNewLabelName] = useState("");
+  const [newLabelColor, setNewLabelColor] = useState("#EF476F");
+  
   const queryClient = useQueryClient();
 
   const { data: boards = [] } = useQuery<Board[]>({
@@ -57,16 +60,38 @@ const CreateTaskModal = ({ onClose, preselectedBoardId }: CreateTaskModalProps) 
   });
 
   const mutation = useMutation({
-    mutationFn: () => createTask(selectedListId, {
-      title,
-      description: description || undefined,
-      due_date: dueDate || undefined,
-      status,
-    }),
+    mutationFn: async () => {
+      let labelId = selectedLabelId;
+  
+      if (newLabelName.trim().length > 0 && !selectedLabelId) {
+        const labelRes = await createLabel(newLabelName.trim(), newLabelColor);
+        queryClient.invalidateQueries({ queryKey: ["labels"] });
+        labelId = labelRes.data.id;
+      }
+  
+      const res = await createTask(selectedListId, {
+        title,
+        description: description || undefined,
+        due_date: dueDate || undefined,
+        status,
+      });
+  
+      const taskId = res.data.id;
+  
+      if (labelId) {
+        await addLabel(taskId, labelId);
+      } else if (labels.length > 0) {
+        const defaultLabel = labels.find(l => l.color === "#EF476F") ?? labels[0];
+        await addLabel(taskId, defaultLabel.id);
+      }
+  
+      return res;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks", selectedListId] });
       onClose();
     },
+
   });
 
   const validate = (): boolean => {
@@ -141,12 +166,40 @@ const CreateTaskModal = ({ onClose, preselectedBoardId }: CreateTaskModalProps) 
               value={selectedLabelId}
               onChange={(e) => setSelectedLabelId(e.target.value)}
               className={styles.select}
+              disabled={!!newLabelName}
             >
               <option value="">No label</option>
               {labels.map(label => (
                 <option key={label.id} value={label.id}>{label.name}</option>
               ))}
             </select>
+
+            <label>Create new label</label>
+
+              <input
+                type="text"
+                placeholder="Label name"
+                value={newLabelName}
+                onChange={(e) => setNewLabelName(e.target.value)}
+                disabled={!!selectedLabelId}
+              />
+              
+              <div className={styles.colorPickerWrapper}>
+              <label className={styles.chooseColorLabel}>Choose the Label Color:</label>
+                <div
+                  className={styles.colorCircle}
+                  style={{ backgroundColor: newLabelColor }}
+                >
+                  <Pencil size={12} className={styles.colorPencil} />
+                  <input
+                    type="color"
+                    value={newLabelColor}
+                    onChange={(e) => setNewLabelColor(e.target.value)}
+                    className={styles.colorInput}
+                    disabled={!!selectedLabelId}
+                  />
+                </div>
+              </div>
 
             <label htmlFor="task-status">Status</label>
             <select

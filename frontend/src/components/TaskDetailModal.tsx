@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { X, Pencil, Save, Trash2 } from "lucide-react";
-import { updateTask, deleteTask } from "../api/tasks";
-import { Task } from "../types";
+import { updateTask, deleteTask, addLabel, removeLabel } from "../api/tasks";
+import { getLabels } from "../api/labels";
+import { Task, Label } from "../types";
 import styles from "./TaskDetailModal.module.css";
 
 interface TaskDetailModalProps {
@@ -16,8 +17,14 @@ const TaskDetailModal = ({ task, onClose }: TaskDetailModalProps) => {
   const [description, setDescription] = useState(task.description ?? "");
   const [dueDate, setDueDate] = useState(task.due_date ?? "");
   const [status, setStatus] = useState(task.status);
+  const [currentLabels, setCurrentLabels] = useState<Label[]>(task.labels);
 
   const queryClient = useQueryClient();
+
+  const { data: allLabels = [] } = useQuery<Label[]>({
+    queryKey: ["labels"],
+    queryFn: () => getLabels().then(res => res.data),
+  });
 
   const updateMutation = useMutation({
     mutationFn: () => updateTask(task.id, { title, description, due_date: dueDate, status }),
@@ -34,6 +41,31 @@ const TaskDetailModal = ({ task, onClose }: TaskDetailModalProps) => {
       onClose();
     },
   });
+
+  const addLabelMutation = useMutation({
+    mutationFn: (labelId: string) => addLabel(task.id, labelId),
+    onSuccess: (res) => {
+      setCurrentLabels(res.data.labels);
+      queryClient.invalidateQueries({ queryKey: ["tasks", task.list_id] });
+    },
+  });
+  
+  const removeLabelMutation = useMutation({
+    mutationFn: (labelId: string) => removeLabel(task.id, labelId),
+    onSuccess: (res) => {
+      setCurrentLabels(res.data.labels);
+      queryClient.invalidateQueries({ queryKey: ["tasks", task.list_id] });
+    },
+  });
+
+  const handleLabelToggle = (label: Label) => {
+    const hasLabel = currentLabels.some(l => l.id === label.id);
+    if (hasLabel) {
+      removeLabelMutation.mutate(label.id);
+    } else {
+      addLabelMutation.mutate(label.id);
+    }
+  };
 
   const handleDelete = () => {
     if (window.confirm("Are you sure you want to delete this task?")) {
@@ -57,6 +89,14 @@ const TaskDetailModal = ({ task, onClose }: TaskDetailModalProps) => {
               />
             ) : (
               <h2 id="task-detail-title" className={styles.title}>{title}</h2>
+            )}
+            {currentLabels.length > 0 && (
+              <span
+                className={styles.labelBadgeHeader}
+                style={{ backgroundColor: currentLabels[0].color ?? "#EF476F" }}
+              >
+                {currentLabels[0].name}
+              </span>
             )}
             <button onClick={onClose} className={styles.closeButton} aria-label="Close modal">
               <X size={20} />
@@ -97,22 +137,29 @@ const TaskDetailModal = ({ task, onClose }: TaskDetailModalProps) => {
               )}
             </div>
 
-            {task.labels.length > 0 && (
-              <div className={styles.field}>
-                <label>Labels</label>
-                <div className={styles.labels}>
-                  {task.labels.map(label => (
-                    <span
+            <div className={styles.field}>
+              <label>Label</label>
+              <div className={styles.labelPicker}>
+                {allLabels.map(label => {
+                  const isActive = currentLabels.some(l => l.id === label.id);
+                  return (
+                    <button
                       key={label.id}
-                      className={styles.labelBadge}
-                      style={{ backgroundColor: label.color ?? "#9CA3AF" }}
+                      className={`${styles.labelOption} ${isActive ? styles.labelOptionActive : ""}`}
+                      style={{ backgroundColor: label.color ?? "#EF476F" }}
+                      onClick={() => handleLabelToggle(label)}
+                      aria-label={`${isActive ? "Remove" : "Add"} label ${label.name}`}
+                      type="button"
                     >
                       {label.name}
-                    </span>
-                  ))}
-                </div>
+                    </button>
+                  );
+                })}
+                {allLabels.length === 0 && (
+                  <span className={styles.fieldValue}>No labels available.</span>
+                )}
               </div>
-            )}
+            </div>
           </div>
 
           <div className={styles.descriptionSection}>
