@@ -98,7 +98,7 @@ const TaskCard = ({ listId, searchQuery, filterLabelId, filterDueDate }: TaskCar
             >
               <div className={styles.cardHeader}>
                 <div className={styles.cardTitle}>
-                  <Grip size={14} />
+                  <Grip size={14} className={styles.cardGrip} />
                   <span className={styles.taskTitle}>{task.title}</span>
                 </div>
                 {task.labels.length > 0 && (

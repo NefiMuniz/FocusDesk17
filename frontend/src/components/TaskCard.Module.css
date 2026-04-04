@@ -27,6 +27,12 @@
     justify-content: flex-start;
     gap: 0.2rem;
 }
+
+.cardGrip{
+    color:#07384C;
+    opacity: 1;
+}
+
 .statusRow{
     display: flex;
     align-items: center;
@@ -35,8 +41,8 @@
 
 .taskTitle {
     font-family: "Poppins", sans-serif;
-    font-weight: 600;
-    color: #118AB2;
+    font-weight: bolder;
+    color:#07384C;
     font-size: 0.8rem;
 }
 
@@ -59,21 +65,21 @@
     font-size: 0.6rem;
     font-weight: 500;
     color: #07384C;
-    opacity: 0.6;
+    opacity: 1;
 }
 
 .dueDate {
     font-family: "Poppins", sans-serif;
     font-size: 0.6rem;
     color: #07384C;
-    opacity: 0.8;
+    opacity: 1;
 }
 
 .description {
     font-family: "Poppins", sans-serif;
     font-size: 0.7rem;
     color: #07384C;
-    opacity: 0.7;
+    opacity: 1;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
@@ -93,7 +99,7 @@
     border: none;
     cursor: pointer;
     color: #07384C;
-    opacity: 0.6;
+    opacity: 1;
     padding: 0.2rem;
     border-radius: 0.3rem;
     display: flex;
@@ -102,7 +108,7 @@
 }
 
 .iconButton:hover {
-    opacity: 1;
+    transform: scale(1.15);
 }
 
 .iconButtonDelete {
@@ -110,7 +116,7 @@
     border: none;
     cursor: pointer;
     color: var(--light-red);
-    opacity: 0.6;
+    opacity: 1;
     padding: 0.2rem;
     border-radius: 0.3rem;
     display: flex;
@@ -119,5 +125,5 @@
 }
 
 .iconButtonDelete:hover {
-    opacity: 1;
+    transform: scale(1.15);
 }

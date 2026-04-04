@@ -3,12 +3,16 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { createBoard } from "../api/boards";
 import styles from "./CreateBoardModal.module.css";
+import useModalKeyboard from "../hooks/useModalKeyboard";
+import useFocusTrap from "../hooks/useFocusTrap";
 
 interface CreateBoardModalProps {
   onClose: () => void;
 }
 
 const CreateBoardModal = ({ onClose }: CreateBoardModalProps) => {
+  useModalKeyboard(onClose);
+  const trapRef = useFocusTrap();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{ name?: string; description?: string }>({});
@@ -39,7 +43,7 @@ const CreateBoardModal = ({ onClose }: CreateBoardModalProps) => {
 
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <div className={styles.modalBorder}>
+        <div className={styles.modalBorder} ref={trapRef}>
             <div className={styles.modal}>
                 <div className={styles.header}>
                     <div>

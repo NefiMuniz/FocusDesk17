@@ -3,6 +3,8 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { createList } from "../api/lists";
 import styles from "./AddListModal.module.css";
+import useModalKeyboard from "../hooks/useModalKeyboard";
+import useFocusTrap from "../hooks/useFocusTrap";
 
 interface AddListModalProps {
   boardId: string;
@@ -10,6 +12,8 @@ interface AddListModalProps {
 }
 
 const AddListModal = ({ boardId, onClose }: AddListModalProps) => {
+  useModalKeyboard(onClose);
+  const trapRef = useFocusTrap();
   const [name, setName] = useState("");
   const [position, setPosition] = useState("");
   const [error, setError] = useState("");
@@ -39,7 +43,7 @@ const AddListModal = ({ boardId, onClose }: AddListModalProps) => {
 
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true" aria-labelledby="add-list-title">
-      <div className={styles.modalBorder}>
+      <div className={styles.modalBorder} ref={trapRef}>
         <div className={styles.modal}>
           <div className={styles.header}>
             <h2 id="add-list-title" className={styles.title}>Add New List</h2>
