@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Grip } from "lucide-react";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import styles from "./TaskCard.module.css";
 import { getTasks, deleteTask } from "../api/tasks";
@@ -97,7 +97,10 @@ const TaskCard = ({ listId, searchQuery, filterLabelId, filterDueDate }: TaskCar
               onKeyDown={(e) => e.key === "Enter" && setSelectedTask(task)}
             >
               <div className={styles.cardHeader}>
-                <span className={styles.taskTitle}>{task.title}</span>
+                <div className={styles.cardTitle}>
+                  <Grip size={14} />
+                  <span className={styles.taskTitle}>{task.title}</span>
+                </div>
                 {task.labels.length > 0 && (
                   <span
                     className={styles.labelBadge}

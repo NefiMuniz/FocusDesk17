@@ -80,13 +80,18 @@
     color: #118AB2;
 }
 
+/*.buttonRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+}*/
+
 .buttonRow {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    justify-content: center;
     align-items: center;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
+    gap: 1rem;
+
 }
 
 .titleRow {
@@ -275,7 +280,7 @@
 }
 
 .listColumn {
-    width: 250px;
+    width: 230px;
     min-width: 30%;
     background: #EEF5F8;
     border-radius: 0.8rem;
@@ -284,7 +289,7 @@
     flex-direction: column;
     gap: 0.8rem;
     border: 2px solid #06D6A0;
-    min-height: 65vh;
+    min-height: 75vh;
     height: 100%;
 }
 
@@ -299,8 +304,8 @@
 
 .listName {
     font-family: "Sniglet", sans-serif;
-    color: #07384C !important;
-    font-size: 1.1rem;
+    color: #118AB2 !important;
+    font-size: 1.5rem;
 }
 
 .listOptionsButton {
@@ -532,14 +537,35 @@ opacity: 1;
 }
 
 .dragOverlayCard {
-    background: #eef5f8;
+    background: linear-gradient(135deg, #cdffd8, #94b9ff);
     border-radius: 0.6rem;
     padding: 0.8rem;
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
     border: 1px solid #118AB2;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     cursor: grabbing;
     width: 250px;
+  }
+  
+.dragOverlayCard .taskTitle {
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    color: #118AB2;
+    font-size: 0.8rem;
+}
+
+.dragOverlayCard .dueDate {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.6rem;
+    color: #07384C;
+    opacity: 0.8;
+}
+
+.dragOverlayCard .description {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.7rem;
+    color: #07384C;
+    opacity: 0.7;
 }

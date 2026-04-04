@@ -25,6 +25,7 @@ const Board = () => {
   const [isAddListModalOpen, setIsAddListModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [activeSearch, setActiveSearch] = useState("");
   const [isEditBoardModalOpen, setIsEditBoardModalOpen] = useState(false);
   const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
   const [editingLabelName, setEditingLabelName] = useState("");
@@ -66,6 +67,29 @@ const Board = () => {
   });
   
   const allTasks: Task[] = taskQueries.flatMap(q => q.data ?? []);
+
+  const filteredCount = allTasks.filter((task) => {
+    const matchesSearch =
+      activeSearch === "" ||
+      task.title.toLowerCase().includes(activeSearch.toLowerCase()) ||
+      task.description?.toLowerCase().includes(activeSearch.toLowerCase());
+  
+    const matchesLabel = !filterLabelId || task.labels.some(l => l.id === filterLabelId);
+  
+    const taskDueDate = task.due_date ? new Date(task.due_date).toISOString().split("T")[0] : null;
+  
+    const matchesDueDate = (() => {
+      if (!filterDueDate) return true;
+      if (!taskDueDate) return false;
+      if (filterDueDate === "today") return taskDueDate === today;
+      if (filterDueDate === "week") return taskDueDate > today && taskDueDate <= endOfWeek;
+      if (filterDueDate === "next_week") return taskDueDate > endOfWeek && taskDueDate <= endOfNextWeek;
+      if (filterDueDate === "overdue") return taskDueDate < today;
+      return true;
+    })();
+  
+    return matchesSearch && matchesLabel && matchesDueDate;
+  }).length;
   
   const today = new Date().toISOString().split("T")[0];
   const endOfWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
@@ -75,6 +99,7 @@ const Board = () => {
   const dueTodayCount = allTasks.filter(t => t.due_date === today).length;
   const dueThisWeekCount = allTasks.filter(t => t.due_date && t.due_date > today && t.due_date <= endOfWeek).length;
   const dueNextWeekCount = allTasks.filter(t => t.due_date && t.due_date > endOfWeek && t.due_date <= endOfNextWeek).length;
+
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteBoard(id!),
@@ -229,10 +254,17 @@ const Board = () => {
             type="search"
             placeholder="Search for tasks"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setActiveSearch(e.target.value); }}
+            onKeyDown={(e) => e.key === "Enter" && setActiveSearch(search)}
             aria-label="Search tasks"
           />
-          <button className={styles.editButton} aria-label="Search">Search</button>
+          <button 
+            className={styles.editButton} 
+            aria-label="Search"
+            onClick={() => setActiveSearch(search)}
+          >
+            <Search size={16} />
+          </button>
         </div>
 
         <div className={styles.statsRow}>
@@ -258,7 +290,7 @@ const Board = () => {
           <div
           className={styles.searchResultText}
           >
-            Quantity of search results will be here
+            {filteredCount} {filteredCount === 1 ? "task" : "tasks"} found
           </div>
           <div
           className={styles.filters}
@@ -331,11 +363,11 @@ const Board = () => {
                   <div className={styles.listHeader}>
                     <h2 className={styles.listName}>{list.name}</h2>
                     <button className={styles.listOptionsButton} aria-label="List options">
-                      <Grip size={18} />
+                    <Grip size={18} />
                     </button>
                   </div>
                   <DroppableList listId={list.id} className={styles.taskList}>
-                    <TaskCard listId={list.id} searchQuery={search} filterLabelId={filterLabelId} filterDueDate={filterDueDate} />
+                  <TaskCard listId={list.id} searchQuery={activeSearch} filterLabelId={filterLabelId} filterDueDate={filterDueDate} />
                   </DroppableList>
                   <div className={styles.listFooter}>
                     <button className={styles.listFooterButton} aria-label="Edit list">
