@@ -1,12 +1,14 @@
 import { NavLink } from "react-router-dom";
-import { Home, LayoutDashboard, LogIn, Sun, Moon } from "lucide-react";
+import { Home, LayoutDashboard, LogIn, LogOut, Sun, Moon } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
 import logoDark from "../assets/Focus_Desk_Logo_Black_Narrow.webp";
 import logoLight from "../assets/Focus_Desk_Logo_White_Narrow.webp";
 import styles from "./Navbar.module.css";
 
 const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
+  const { isAuthenticated, logout } = useAuth();
 
   return (
     <nav className={styles.navbar} aria-label="Main navigation">
@@ -31,10 +33,25 @@ const Navbar = () => {
           </NavLink>
         </li>
         <li>
-          <NavLink to="/login" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
-            <LogIn size={18} aria-hidden="true" />
-            Login
-          </NavLink>
+          {isAuthenticated ? (
+            <button onClick={logout} 
+              className={styles.navLink}>
+              <LogOut size={18} />
+              Logout
+            </button>
+          ) : (
+            <NavLink
+              to="/login"
+              className={({ isActive }) =>
+                isActive
+                  ? `${styles.navLink} ${styles.active}`
+                  : styles.navLink
+              }
+            >
+              <LogIn size={18} />
+              Login
+            </NavLink>
+          )}
         </li>
       </ul>
 

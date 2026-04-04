@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import styles from "./Boards.module.css";
-import { SquareDashedKanban, BadgeCheck, BadgeAlert, ShieldAlert, Goal, CalendarCheck2, PlusCircle, LayoutDashboard } from "lucide-react";
+import { SquareDashedKanban, Pencil, BadgeCheck, BadgeAlert, ShieldAlert, Goal, CalendarCheck2, PlusCircle, LayoutDashboard } from "lucide-react";
 import { getBoards } from "../api/boards";
 import { Board, Task } from "../types";
 import CreateBoardModal from "../components/CreateBoardModal";
 import CreateTaskModal from "../components/CreateTaskModal";
-import { getUserFromToken } from "../api/auth";
+//import { getUserFromToken } from "../api/auth";
+import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const Boards = () => {
@@ -37,12 +38,23 @@ const Boards = () => {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
 
-  const user = getUserFromToken();
+  const { user } = useAuth();
 
   return (
     <div className={styles.container}>
 
-      <h1 className={styles.welcome}>Welcome, {user?.name ?? "User"}!</h1>
+      <div className={styles.welcomeContainer}>
+        <h1 className={styles.welcome}>
+          Welcome, {user?.name ?? "User"}!
+        </h1>
+
+        <button
+          className={styles.profileEditButton}
+          aria-label="Edit profile"
+          onClick={() => console.log("edit user")}>
+          <Pencil size={16} />
+        </button>
+      </div>
 
       <div className={styles.actions}>
         <button className={styles.button} onClick={() => setIsModalOpen(true)}>
