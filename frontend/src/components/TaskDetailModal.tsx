@@ -5,6 +5,8 @@ import { updateTask, deleteTask, addLabel, removeLabel } from "../api/tasks";
 import { getLabels } from "../api/labels";
 import { Task, Label } from "../types";
 import styles from "./TaskDetailModal.module.css";
+import useModalKeyboard from "../hooks/useModalKeyboard";
+import useFocusTrap from "../hooks/useFocusTrap";
 
 interface TaskDetailModalProps {
   task: Task;
@@ -12,6 +14,8 @@ interface TaskDetailModalProps {
 }
 
 const TaskDetailModal = ({ task, onClose }: TaskDetailModalProps) => {
+  useModalKeyboard(onClose);
+  const trapRef = useFocusTrap();
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description ?? "");
@@ -75,7 +79,7 @@ const TaskDetailModal = ({ task, onClose }: TaskDetailModalProps) => {
 
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true" aria-labelledby="task-detail-title">
-      <div className={styles.modalBorder}>
+      <div className={styles.modalBorder} ref={trapRef}>
         <div className={styles.modal}>
 
           <div className={styles.header}>

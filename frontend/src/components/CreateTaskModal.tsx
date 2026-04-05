@@ -8,6 +8,8 @@ import { getLabels, createLabel } from "../api/labels";
 import { Pencil } from "lucide-react";
 import { Board, TaskList, Label } from "../types";
 import styles from "./CreateTaskModal.module.css";
+import useModalKeyboard from "../hooks/useModalKeyboard";
+import useFocusTrap from "../hooks/useFocusTrap";
 
 interface CreateTaskModalProps {
   onClose: () => void;
@@ -15,6 +17,8 @@ interface CreateTaskModalProps {
 }
 
 const CreateTaskModal = ({ onClose, preselectedBoardId }: CreateTaskModalProps) => {
+  useModalKeyboard(onClose);
+  const trapRef = useFocusTrap();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -111,7 +115,7 @@ const CreateTaskModal = ({ onClose, preselectedBoardId }: CreateTaskModalProps) 
 
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true" aria-labelledby="create-task-title">
-      <div className={styles.modalBorder}>
+      <div className={styles.modalBorder} ref={trapRef}>
         <div className={styles.modal}>
           <div className={styles.header}>
             <h2 id="create-task-title" className={styles.title}>Add New Task</h2>
@@ -174,8 +178,7 @@ const CreateTaskModal = ({ onClose, preselectedBoardId }: CreateTaskModalProps) 
               ))}
             </select>
 
-            <label>Create new label</label>
-
+            <label htmlFor="task-label-color">Create new label</label>
               <input
                 type="text"
                 placeholder="Label name"
@@ -185,7 +188,7 @@ const CreateTaskModal = ({ onClose, preselectedBoardId }: CreateTaskModalProps) 
               />
               
               <div className={styles.colorPickerWrapper}>
-              <label className={styles.chooseColorLabel}>Choose the Label Color:</label>
+              <label className={styles.chooseColorLabel} htmlFor="task-label-color-picker">Choose the Label Color:</label>
                 <div
                   className={styles.colorCircle}
                   style={{ backgroundColor: newLabelColor }}

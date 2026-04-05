@@ -317,3 +317,42 @@
 .addListButtonLarge:hover {
     opacity: 0.85;
 }
+
+@media (max-width: 768px) {
+    .container {
+      padding: 1rem;
+    }
+  
+    .statsGrid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+  
+    .largeGrid {
+      grid-template-columns: 1fr;
+    }
+  
+    .boardsGrid {
+      grid-template-columns: 1fr;
+    }
+  
+    .actions {
+      flex-wrap: wrap;
+    }
+  
+    .button {
+      font-size: 0.85rem;
+      padding: 0.5rem 0.8rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .statsGrid {
+      grid-template-columns: 1fr;
+    }
+  
+    .welcome {
+      font-size: 1.5rem;
+      text-align: right;
+    }
+}
