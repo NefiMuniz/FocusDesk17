@@ -4,6 +4,8 @@ import { X } from "lucide-react";
 import { updateBoard } from "../api/boards";
 import { Board } from "../types";
 import styles from "./EditBoardModal.module.css";
+import useModalKeyboard from "../hooks/useModalKeyboard";
+import useFocusTrap from "../hooks/useFocusTrap";
 
 interface EditBoardModalProps {
   board: Board;
@@ -11,6 +13,8 @@ interface EditBoardModalProps {
 }
 
 const EditBoardModal = ({ board, onClose }: EditBoardModalProps) => {
+  useModalKeyboard(onClose);
+  const trapRef = useFocusTrap();
   const [name, setName] = useState(board.name);
   const [description, setDescription] = useState(board.description ?? "");
   const [fieldErrors, setFieldErrors] = useState<{ name?: string; description?: string }>({});
@@ -42,7 +46,7 @@ const EditBoardModal = ({ board, onClose }: EditBoardModalProps) => {
 
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true" aria-labelledby="edit-board-title">
-      <div className={styles.modalBorder}>
+      <div className={styles.modalBorder} ref={trapRef}>
         <div className={styles.modal}>
           <div className={styles.header}>
             <div>
