@@ -17,6 +17,12 @@
 .cardHeader {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.2rem;
+}
+
+.statusRow{
+    display: flex;
     align-items: center;
     gap: 0.2rem;
 }

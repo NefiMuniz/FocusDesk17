@@ -30,9 +30,9 @@ def login(
 
     Frontend — Login form submit button:
 
-        const formData = new FormData();
-        formData.append('username', email);   // ← field name MUST be 'username'
-        formData.append('password', password);
+  access_token = create_access_token(
+    data={"sub": str(user.id)}
+  )
 
         const res = await fetch('/api/auth/login', {
             method: 'POST',
@@ -53,7 +53,7 @@ def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token = create_access_token(data={"sub": user.email})
+    access_token = create_access_token(data={"sub": str(user.id)})
     return {"access_token": access_token, "token_type": "bearer"}
 
 
