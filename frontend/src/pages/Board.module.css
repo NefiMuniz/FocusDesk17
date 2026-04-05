@@ -364,6 +364,8 @@
     color: var(--light-red);
     cursor: pointer;
     opacity: 1;
+<<<<<<< HEAD
+=======
     display: flex;
     align-items: center;
     padding: 0.2rem;
@@ -373,6 +375,28 @@
 
 .deleteButtonFooter:hover { 
     transform: scale(1.15); 
+}
+
+.deleteButtonFooter{
+    border: none;
+    background: none;
+    color: var(--light-red);
+    cursor: pointer;
+    opacity: 0.6;
+>>>>>>> d881f35ff615ca7f0c19a1ff9cba948cd120c05e
+    display: flex;
+    align-items: center;
+    padding: 0.2rem;
+    border-radius: 0.3rem;
+    transition: opacity 0.5s;
+}
+
+.deleteButtonFooter:hover { 
+<<<<<<< HEAD
+    transform: scale(1.15); 
+=======
+    opacity: 1; 
+>>>>>>> d881f35ff615ca7f0c19a1ff9cba948cd120c05e
 }
 
 .addListButton {
