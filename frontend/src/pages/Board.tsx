@@ -34,6 +34,10 @@ const Board = () => {
   const [filterLabelId, setFilterLabelId] = useState("");
   const [filterDueDate, setFilterDueDate] = useState("");
 
+  const today = new Date().toISOString().split("T")[0];
+  const endOfWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+  const endOfNextWeek = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 5 },
@@ -91,9 +95,7 @@ const Board = () => {
     return matchesSearch && matchesLabel && matchesDueDate;
   }).length;
   
-  const today = new Date().toISOString().split("T")[0];
-  const endOfWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-  const endOfNextWeek = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+
   
   const availableCount = allTasks.length;
   const dueTodayCount = allTasks.filter(t => t.due_date === today).length;

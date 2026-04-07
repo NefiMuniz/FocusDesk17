@@ -7,7 +7,7 @@ import { getTasks, deleteTask } from "../api/tasks";
 import { Task } from "../types";
 import TaskDetailModal from "./TaskDetailModal";
 import SortableTaskCard from "./SortableTaskCard";
-import { isToday, isBefore, isAfter, addDays, startOfDay } from "date-fns";
+import { isToday, isBefore, isAfter, addDays, startOfDay, parseISO } from "date-fns";
 
 interface TaskCardProps {
   listId: string;
@@ -35,35 +35,39 @@ const TaskCard = ({ listId, searchQuery, filterLabelId, filterDueDate }: TaskCar
     const matchesSearch =
       task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.description?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesLabel = !filterLabelId || task.labels.some(l => l.id === filterLabelId);
+  
+    const matchesLabel =
+      !filterLabelId || task.labels.some((l) => l.id === filterLabelId);
+  
     const matchesDueDate = (() => {
       if (!filterDueDate) return true;
       if (!task.due_date) return false;
-    
-      const dueDate = startOfDay(new Date(task.due_date));
+  
+      const dueDate = startOfDay(parseISO(task.due_date));
       const now = startOfDay(new Date());
-    
+  
       if (filterDueDate === "today") {
         return isToday(dueDate);
       }
-    
+  
       if (filterDueDate === "overdue") {
-        return isBefore(dueDate, now) && !isToday(dueDate);
+        return isBefore(dueDate, now);
       }
-    
+  
       if (filterDueDate === "week") {
         const in7Days = addDays(now, 7);
-        return isAfter(dueDate, now) && isBefore(dueDate, in7Days);
+        return !isBefore(dueDate, now) && !isAfter(dueDate, in7Days);
       }
-    
+  
       if (filterDueDate === "next_week") {
         const in7Days = addDays(now, 7);
         const in14Days = addDays(now, 14);
-        return isAfter(dueDate, in7Days) && isBefore(dueDate, in14Days);
+        return isAfter(dueDate, in7Days) && !isAfter(dueDate, in14Days);
       }
-    
+  
       return true;
     })();
+  
     return matchesSearch && matchesLabel && matchesDueDate;
   });
 

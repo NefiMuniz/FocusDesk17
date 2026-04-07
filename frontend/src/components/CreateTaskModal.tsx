@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import { X } from "lucide-react";
+import { X, Pencil } from "lucide-react";
 import { createTask, addLabel } from "../api/tasks";
 import { getBoards } from "../api/boards";
-import { getLists } from "../api/lists";
+import { getLists, createList } from "../api/lists";
 import { getLabels, createLabel } from "../api/labels";
-import { Pencil } from "lucide-react";
 import { Board, TaskList, Label } from "../types";
 import styles from "./CreateTaskModal.module.css";
 import useModalKeyboard from "../hooks/useModalKeyboard";
@@ -29,28 +28,14 @@ const CreateTaskModal = ({ onClose, preselectedBoardId }: CreateTaskModalProps) 
   const [fieldErrors, setFieldErrors] = useState<{ title?: string; list?: string }>({});
   const [newLabelName, setNewLabelName] = useState("");
   const [newLabelColor, setNewLabelColor] = useState("#EF476F");
-  
+  const [newListName, setNewListName] = useState("");
+
   const queryClient = useQueryClient();
 
   const { data: boards = [] } = useQuery<Board[]>({
     queryKey: ["boards"],
     queryFn: () => getBoards().then(res => res.data),
   });
-
-  const { data: allLists = [] } = useQuery<TaskList[]>({
-    queryKey: ["lists", "all"],
-    queryFn: async () => {
-      const results = await Promise.all(
-        boards.map(board => getLists(board.id).then(res => res.data))
-      );
-      return results.flat();
-    },
-    enabled: boards.length > 0,
-  });
-
-  const boardsWithLists = boards.filter(board =>
-    allLists.some(list => list.board_id === board.id)
-  );
 
   const { data: lists = [] } = useQuery<TaskList[]>({
     queryKey: ["lists", selectedBoardId],
@@ -63,46 +48,58 @@ const CreateTaskModal = ({ onClose, preselectedBoardId }: CreateTaskModalProps) 
     queryFn: () => getLabels().then(res => res.data),
   });
 
+  const boardHasNoLists = !!selectedBoardId && lists.length === 0;
+
   const mutation = useMutation({
     mutationFn: async () => {
+      let listId = selectedListId;
+
+      if (boardHasNoLists && newListName.trim().length > 0) {
+        const listRes = await createList(selectedBoardId, newListName.trim());
+        queryClient.invalidateQueries({ queryKey: ["lists", selectedBoardId] });
+        listId = listRes.data.id;
+      }
+
       let labelId = selectedLabelId;
-  
       if (newLabelName.trim().length > 0 && !selectedLabelId) {
         const labelRes = await createLabel(newLabelName.trim(), newLabelColor);
         queryClient.invalidateQueries({ queryKey: ["labels"] });
         labelId = labelRes.data.id;
       }
-  
-      const res = await createTask(selectedListId, {
+
+      const res = await createTask(listId, {
         title,
         description: description || undefined,
         due_date: dueDate || undefined,
         status,
       });
-  
+
       const taskId = res.data.id;
-  
+
       if (labelId) {
         await addLabel(taskId, labelId);
       } else if (labels.length > 0) {
         const defaultLabel = labels.find(l => l.color === "#EF476F") ?? labels[0];
         await addLabel(taskId, defaultLabel.id);
       }
-  
+
       return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks", selectedListId] });
       onClose();
     },
-
   });
 
   const validate = (): boolean => {
     const errors: { title?: string; list?: string } = {};
     if (title.trim().length < 1) errors.title = "Title is required.";
     if (title.trim().length > 200) errors.title = "Title must be under 200 characters.";
-    if (!selectedListId) errors.list = "Please select a list.";
+    if (!selectedListId && !(boardHasNoLists && newListName.trim().length > 0)) {
+      errors.list = boardHasNoLists
+        ? "Please enter a name for the new list."
+        : "Please select a list.";
+    }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -139,29 +136,46 @@ const CreateTaskModal = ({ onClose, preselectedBoardId }: CreateTaskModalProps) 
             <select
               id="task-board"
               value={selectedBoardId}
-              onChange={(e) => { setSelectedBoardId(e.target.value); setSelectedListId(""); }}
+              onChange={(e) => {
+                setSelectedBoardId(e.target.value);
+                setSelectedListId("");
+                setNewListName("");
+              }}
               disabled={!!preselectedBoardId}
               className={styles.select}
             >
               <option value="">Select a board</option>
-              {(preselectedBoardId ? boards : boardsWithLists).map(board => (
+              {boards.map(board => (
                 <option key={board.id} value={board.id}>{board.name}</option>
               ))}
             </select>
 
             <label htmlFor="task-list">List *</label>
-            <select
-              id="task-list"
-              value={selectedListId}
-              onChange={(e) => setSelectedListId(e.target.value)}
-              disabled={!selectedBoardId}
-              className={styles.select}
-            >
-              <option value="">Select a list</option>
-              {lists.map(list => (
-                <option key={list.id} value={list.id}>{list.name}</option>
-              ))}
-            </select>
+            {boardHasNoLists ? (
+              <>
+                <p className={styles.infoText}>This board has no lists yet. Create one to continue:</p>
+                <input
+                  id="task-list"
+                  type="text"
+                  placeholder="New list name (e.g. To-Do)"
+                  value={newListName}
+                  onChange={(e) => setNewListName(e.target.value)}
+                />
+              </>
+            ) : (
+              <select
+                id="task-list"
+                value={selectedListId}
+                onChange={(e) => setSelectedListId(e.target.value)}
+                disabled={!selectedBoardId}
+                className={styles.select}
+              >
+                <option value="">Select a list</option>
+                {lists.map(list => (
+                  <option key={list.id} value={list.id}>{list.name}</option>
+                ))}
+              </select>
+            )}
             {fieldErrors.list && <p role="alert" className={styles.fieldError}>{fieldErrors.list}</p>}
 
             <label htmlFor="task-label">Label</label>
@@ -179,30 +193,30 @@ const CreateTaskModal = ({ onClose, preselectedBoardId }: CreateTaskModalProps) 
             </select>
 
             <label htmlFor="task-label-color">Create new label</label>
-              <input
-                type="text"
-                placeholder="Label name"
-                value={newLabelName}
-                onChange={(e) => setNewLabelName(e.target.value)}
-                disabled={!!selectedLabelId}
-              />
-              
-              <div className={styles.colorPickerWrapper}>
+            <input
+              type="text"
+              placeholder="Label name"
+              value={newLabelName}
+              onChange={(e) => setNewLabelName(e.target.value)}
+              disabled={!!selectedLabelId}
+            />
+
+            <div className={styles.colorPickerWrapper}>
               <label className={styles.chooseColorLabel} htmlFor="task-label-color-picker">Choose the Label Color:</label>
-                <div
-                  className={styles.colorCircle}
-                  style={{ backgroundColor: newLabelColor }}
-                >
-                  <Pencil size={12} className={styles.colorPencil} />
-                  <input
-                    type="color"
-                    value={newLabelColor}
-                    onChange={(e) => setNewLabelColor(e.target.value)}
-                    className={styles.colorInput}
-                    disabled={!!selectedLabelId}
-                  />
-                </div>
+              <div
+                className={styles.colorCircle}
+                style={{ backgroundColor: newLabelColor }}
+              >
+                <Pencil size={12} className={styles.colorPencil} />
+                <input
+                  type="color"
+                  value={newLabelColor}
+                  onChange={(e) => setNewLabelColor(e.target.value)}
+                  className={styles.colorInput}
+                  disabled={!!selectedLabelId}
+                />
               </div>
+            </div>
 
             <label htmlFor="task-status">Status</label>
             <select

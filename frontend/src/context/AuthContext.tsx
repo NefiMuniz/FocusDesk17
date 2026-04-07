@@ -11,6 +11,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (token: string) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -18,33 +19,13 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
+  const fetchUser = async () => {
     const token = localStorage.getItem("token");
-  
     if (!token) return;
-  
-    api.get("/auth/me", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(res => setUser(res.data))
-      .catch(() => {
-        localStorage.removeItem("token");
-        setUser(null);
-      });
-  }, []);
-
-  const login = async (token: string) => {
-    localStorage.setItem("token", token);
-  
     try {
       const res = await api.get("/auth/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-  
       setUser(res.data);
     } catch {
       localStorage.removeItem("token");
@@ -52,20 +33,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const login = async (token: string) => {
+    localStorage.setItem("token", token);
+    await fetchUser();
+  };
+
   const logout = async () => {
     const token = localStorage.getItem("token");
-
     try {
       await api.post("/auth/logout", {}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
     } catch {}
-
     localStorage.removeItem("token");
     setUser(null);
     window.location.href = "/login";
+  };
+
+  const refreshUser = async () => {
+    await fetchUser();
   };
 
   return (
@@ -75,6 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isAuthenticated: !!user,
         login,
         logout,
+        refreshUser,
       }}
     >
       {children}
