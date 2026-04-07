@@ -10,26 +10,27 @@
 
 .modalBorder {
     background: linear-gradient(to right, #118AB2, #06D6A0);
-    border-radius: 1.7rem;
+    border-radius: 0.8rem;
     padding: 3px;
     width: 90%;
-    max-width: 35rem;
+    max-width: 32rem;
 }
 
 .modal {
     background: linear-gradient(135deg, #cdffd8, #94b9ff);
-    border-radius: 1.5rem;
+    border-radius: 0.6rem;
     padding: 2rem;
     width: 100%;
     box-shadow: 0 0 30px rgba(6, 214, 160, 0.3);
     position: relative;
+    box-shadow: 0 0 0 2px rgba(6, 214, 160, 0.3);
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .title {
@@ -83,7 +84,7 @@
     background-color: rgba(255, 255, 255, 0.5);
     font-family: "Poppins", sans-serif;
     font-size: 0.8rem;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.5rem;
     outline: none;
     resize: none;
 }
@@ -103,17 +104,18 @@
 }
 
 .error {
-    color: #8b0000;
+    color: var(--dark-red);
     font-family: "Poppins", sans-serif;
     font-size: 0.9rem;
     text-align: center;
+    margin-bottom: 0.5rem;
 }
 
 .actions {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
 }
 
 .cancelButton {
@@ -122,7 +124,7 @@
     border: 2px solid var(--dark-red);
     background: none;
     font-family: "Poppins", sans-serif;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
     color: var(--dark-red);
     cursor: pointer;
@@ -134,12 +136,12 @@
 }
 
 .submitButton {
-    padding: 0.6rem 1.5rem;
+    padding: 0.3rem 1rem;
     border-radius: 0.5rem;
     border: 2px solid #118AB2;
     background: linear-gradient(135deg, #cdffd8, #94b9ff);
     font-family: "Poppins", sans-serif;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
     color: #07384C;
     cursor: pointer;

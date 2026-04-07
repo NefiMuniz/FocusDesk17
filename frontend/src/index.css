@@ -11,7 +11,14 @@
   --bg-nav: #000000;
   --text-primary: #EEF5FB;
   --text-nav: #EEF5FB;
+  --nav-active: #06D6A0;
   --padding-nav:0.01rem 3rem;
+  --rounded-button: #06D6A0;
+  --dark-red: #8b0000;
+  --light-red: #EF476F;
+  --error: #EF476F;
+  --text-secondary: rgba(238, 245, 251, 0.75);
+  --text-muted: rgba(238, 245, 251, 0.6);
 }
 
 :root[data-theme="light"] {
@@ -19,7 +26,14 @@
   --bg-nav: #EEF5FB;
   --text-primary: #07384C;
   --text-nav: #07384C;
+  --nav-active: #8b0000;
   --padding-nav:0.5rem 3rem;
+  --rounded-button: #118AB2;
+  --dark-red: #8b0000;
+  --light-red: #EF476F;
+  --error: #8b0000;
+  --text-secondary: #2a5f74;
+  --text-muted: #3d7a94;
 }
 
 body {
@@ -35,4 +49,29 @@ main {
   min-height: 100vh;
   margin: auto;
   width: 75%;
+}
+
+.skipLink {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  background: #118AB2;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  z-index: 9999;
+  text-decoration: none;
+  border-radius: 0 0 0.5rem 0;
+  transition: top 0.2s;
+}
+
+.skipLink:focus {
+  top: 0;
+}
+
+@media (max-width: 768px) {
+  main {
+    width: 95%;
+  }
 }
