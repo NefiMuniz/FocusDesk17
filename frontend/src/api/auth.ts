@@ -20,3 +20,8 @@ export const getUserFromToken = () => {
     return null;
   }
 };
+
+export const updateMe = (data: { name?: string; email?: string }) =>
+  api.patch("/auth/me", data);
+
+export const getMe = () => api.get("/auth/me");

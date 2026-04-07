@@ -6,9 +6,9 @@ import { getBoards } from "../api/boards";
 import { Board, Task } from "../types";
 import CreateBoardModal from "../components/CreateBoardModal";
 import CreateTaskModal from "../components/CreateTaskModal";
-//import { getUserFromToken } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import EditProfileModal from "../components/EditProfileModal";
 
 const Boards = () => {
   useEffect(() => {
@@ -39,6 +39,7 @@ const Boards = () => {
 
 
   const { user } = useAuth();
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
   return (
     <div className={styles.container}>
@@ -51,7 +52,7 @@ const Boards = () => {
         <button
           className={styles.profileEditButton}
           aria-label="Edit profile"
-          onClick={() => console.log("edit user")}>
+          onClick={() => setIsEditProfileOpen(true)}>
           <Pencil size={16} />
         </button>
       </div>
@@ -192,6 +193,7 @@ const Boards = () => {
       </div>
       {isModalOpen && <CreateBoardModal onClose={() => setIsModalOpen(false)} />}
       {isTaskModalOpen && <CreateTaskModal onClose={() => setIsTaskModalOpen(false)} />}
+      {isEditProfileOpen && <EditProfileModal onClose={() => setIsEditProfileOpen(false)} />}
     </div>
   );
 };
