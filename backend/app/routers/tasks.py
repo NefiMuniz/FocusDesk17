@@ -1,5 +1,4 @@
 # ============================================================
-# REORDER LOGIC — Sprint 3 (critical for dnd-kit):
 #   Called after every drag-drop event on the frontend.
 #   1. If new_list_id != current list_id: move task to new list
 #   2. In the destination list, shift all tasks at >= new_position up by 1
@@ -9,10 +8,13 @@
 # SECURITY: Traverse list → board to confirm board.user_id == current_user.id
 #
 # Frontend — API contract:
-#   GET /api/lists/{listId}/tasks/ → array of TaskResponse sorted by `position`
-#   Render task cards in the order they arrive — already sorted by backend.
-#   TaskResponse.labels → array of { id, name, color } — render as colored badges.
-#   TaskResponse.due_date → "YYYY-MM-DD" string — highlight red if past today.
+#   GET /api/tasks/           → all tasks for the current user across all boards
+#   GET /api/tasks/completed  → only tasks with status='done' for the current user
+#   GET /api/lists/{listId}/tasks/ → tasks in one column, sorted by position
+#   GET /api/tasks/{taskId}   → single task with labels
+#   TaskResponse.labels       → array of { id, name, color } — render as colored badges
+#   TaskResponse.due_date     → "YYYY-MM-DD" string — highlight red if past today
+#   TaskResponse.status       → 'todo' | 'in_progress' | 'done' — DB column, not list position
 #
 # dnd-kit contract — PATCH /api/tasks/{id}/reorder:
 #   onDragEnd callback should call:
@@ -66,6 +68,77 @@ def verify_list_owner(db: Session, list_id: UUID, user_id: UUID) -> TaskList:
     return task_list
 
 
+# ── Get ALL tasks for the current user ───────────────────────────────────────
+
+@router.get(
+    "/api/tasks/",
+    response_model=list[TaskResponse],
+    summary="Get all tasks for the current user across all boards",
+)
+def get_all_tasks(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Returns every task belonging to the authenticated user regardless of
+    which board or list it's in. Ordered by creation date descending
+    (newest first).
+
+    Frontend — use for a global "My Tasks" dashboard view:
+
+        const res = await fetch('/api/tasks/', {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
+        queryKey: ['tasks', 'all']
+    """
+    return (
+        db.query(Task)
+        .join(TaskList, Task.list_id == TaskList.id)
+        .join(Board, TaskList.board_id == Board.id)
+        .filter(Board.user_id == current_user.id)
+        .order_by(Task.created_at.desc())
+        .all()
+    )
+
+
+# ── Get only COMPLETED tasks for the current user ────────────────────────────
+
+@router.get(
+    "/api/tasks/completed",
+    response_model=list[TaskResponse],
+    summary="Get all completed tasks (status='done') for the current user",
+)
+def get_completed_tasks(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Returns all tasks where status='done' for the authenticated user,
+    across all boards and lists. Ordered by most recently updated.
+
+    The `status` field is a real DB column — it is independent of which
+    list/column the task lives in. A task can be marked 'done' while still
+    sitting in a "Backlog" column if the user chose to do so.
+
+    Frontend — use for a "Completed" or "Archive" view:
+
+        const res = await fetch('/api/tasks/completed', {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
+        queryKey: ['tasks', 'completed']
+    """
+    return (
+        db.query(Task)
+        .join(TaskList, Task.list_id == TaskList.id)
+        .join(Board, TaskList.board_id == Board.id)
+        .filter(Board.user_id == current_user.id, Task.status == "done")
+        .order_by(Task.updated_at.desc())
+        .all()
+    )
+
+
+# ── Get tasks in a specific list ──────────────────────────────────────────────
+
 @router.get("/api/lists/{list_id}/tasks/", response_model=list[TaskResponse])
 def get_tasks(
     list_id: UUID,
@@ -86,6 +159,25 @@ def get_tasks(
         .all()
     )
 
+
+# ── Get a single task ─────────────────────────────────────────────────────────
+
+@router.get("/api/tasks/{task_id}", response_model=TaskResponse)
+def get_task(
+    task_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Returns a single task with its labels.
+    Member 2: call when user clicks a task card to open the detail modal.
+        queryKey: ['tasks', taskId]
+        Response includes `labels` array — render each as a colored badge.
+    """
+    return get_task_or_404(db, task_id, current_user.id)
+
+
+# ── Create a task ─────────────────────────────────────────────────────────────
 
 @router.post(
     "/api/lists/{list_id}/tasks/",
@@ -124,20 +216,7 @@ def create_task(
     return new_task
 
 
-@router.get("/api/tasks/{task_id}", response_model=TaskResponse)
-def get_task(
-    task_id: UUID,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    """
-    Returns a single task with its labels.
-    Member 2: call when user clicks a task card to open the detail modal.
-        queryKey: ['tasks', taskId]
-        Response includes `labels` array — render each as a colored badge.
-    """
-    return get_task_or_404(db, task_id, current_user.id)
-
+# ── Update a task ─────────────────────────────────────────────────────────────
 
 @router.patch("/api/tasks/{task_id}", response_model=TaskResponse)
 def update_task(
@@ -161,6 +240,8 @@ def update_task(
     return task
 
 
+# ── Reorder / move a task ─────────────────────────────────────────────────────
+
 @router.patch("/api/tasks/{task_id}/reorder", response_model=TaskResponse)
 def reorder_task(
     task_id: UUID,
@@ -180,14 +261,14 @@ def reorder_task(
     old_list_id = task.list_id
 
     if old_list_id != payload.new_list_id:
-        # Close the gap in the source list by shifting tasks down
+        # Close the gap in the source list
         db.query(Task).filter(
             Task.list_id == old_list_id,
             Task.position > task.position
         ).update({"position": Task.position - 1}, synchronize_session=False)
         task.list_id = payload.new_list_id
 
-    # Make room in the destination list by shifting tasks up
+    # Make room in the destination list
     db.query(Task).filter(
         Task.list_id == payload.new_list_id,
         Task.position >= payload.new_position,
@@ -199,6 +280,8 @@ def reorder_task(
     db.refresh(task)
     return task
 
+
+# ── Add a label to a task ─────────────────────────────────────────────────────
 
 @router.post("/api/tasks/{task_id}/labels/{label_id}", response_model=TaskResponse)
 def add_label_to_task(
@@ -226,6 +309,8 @@ def add_label_to_task(
     return task
 
 
+# ── Remove a label from a task ────────────────────────────────────────────────
+
 @router.delete("/api/tasks/{task_id}/labels/{label_id}", response_model=TaskResponse)
 def remove_label_from_task(
     task_id: UUID,
@@ -244,6 +329,8 @@ def remove_label_from_task(
     db.refresh(task)
     return task
 
+
+# ── Delete a task ─────────────────────────────────────────────────────────────
 
 @router.delete("/api/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_task(
