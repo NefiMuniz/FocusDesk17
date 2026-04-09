@@ -7,14 +7,14 @@
 #   BoardResponse → what every successful response returns
 # ============================================================
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from uuid import UUID
-
 from app.database import get_db
 from app.auth.dependencies import get_current_user
 from app.models import User, Board
 from app.schemas.board import BoardCreate, BoardUpdate, BoardResponse
+from app.logging_config import security_logger
 
 router = APIRouter(prefix="/api/boards", tags=["Boards"])
 
@@ -102,6 +102,7 @@ def update_board(
 
 @router.delete("/{board_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_board(
+    request: Request,
     board_id: UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -111,6 +112,12 @@ def delete_board(
     Member 2: call from delete confirmation dialog.
         After success: invalidateQueries({ queryKey: ['boards'] }) + navigate to dashboard
     """
+
+    client_ip = request.client.host if request.client else "unknown"
+
     board = get_board_or_404(db, board_id, current_user.id)
+
+    board_name = board.name
+    security_logger.log_board_deleted(str(current_user.id), str(board_id), board_name, client_ip)
     db.delete(board)
     db.commit()
