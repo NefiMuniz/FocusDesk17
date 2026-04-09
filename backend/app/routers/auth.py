@@ -1,13 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-
 from app.database import get_db
 from app.models import User
 from app.schemas.user import UserCreate, UserResponse, UserUpdate, LoginResponse
 from app.auth.security import verify_password, create_access_token, get_password_hash
 from app.auth.dependencies import get_current_user
+from app.middleware.rate_limit import limiter
+from app.logging_config import security_logger
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -20,7 +21,9 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
         401: {"description": "Incorrect email or password"},
     },
 )
+@limiter.limit("5/minute")
 def login(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
@@ -45,13 +48,17 @@ def login(
         401 → "Incorrect email or password" → show inline error
     """
     user = db.query(User).filter(User.email == form_data.username).first()
+    client_ip = request.client.host if request.client else "unknown"
 
     if not user or not verify_password(form_data.password, user.password_hash):
+        security_logger.log_failed_login(form_data.username, client_ip)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    security_logger.log_successful_login(str(user.id), client_ip)
 
     access_token = create_access_token(data={"sub": str(user.id)})
     return {"access_token": access_token, "token_type": "bearer"}
@@ -68,7 +75,8 @@ def login(
         422: {"description": "Validation error — see detail for per-field messages"},
     },
 )
-def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
+@limiter.limit("3/minute")
+def register_user(request: Request, user_in: UserCreate, db: Session = Depends(get_db)):
     """
     Creates a new user account. Returns the created user (no password).
 
@@ -148,6 +156,7 @@ def get_me(current_user: User = Depends(get_current_user)):
     },
 )
 def update_me(
+    request: Request,
     payload: UserUpdate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -173,17 +182,22 @@ def update_me(
         422 → validation error
     """
     if payload.email and payload.email != current_user.email:
+        old_email = current_user.email
+        client_ip = request.client.host if request.client else "unknown"
         taken = db.execute(
             select(User).where(
                 User.email == payload.email,
                 User.id != current_user.id,
             )
         ).scalar_one_or_none()
+
         if taken:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="This email is already taken by another account.",
             )
+
+        security_logger.log_email_changed(str(current_user.id), old_email, payload.email, client_ip)
 
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(current_user, field, value)
