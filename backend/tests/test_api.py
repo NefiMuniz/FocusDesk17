@@ -276,3 +276,66 @@ def test_reorder_task():
 def test_access_without_token():
     res = client.get("/api/boards/")
     assert res.status_code == 401
+
+
+
+def test_board_cascade_delete():
+    auth = create_user_and_token()
+
+    print("\n--- START CASCADE DELETE TEST ---")
+
+    # 1. Create a board
+    res = client.post("/api/boards/", json={"name": "CascadeBoard"}, headers=auth["headers"])
+    board = res.json()
+    board_id = board["id"]
+    print(f"Board created: {board}")
+
+    # 2. Create a list inside the board
+    res = client.post(
+        f"/api/boards/{board_id}/lists/",
+        json={"name": "List1"},
+        headers=auth["headers"]
+    )
+    lst = res.json()
+    list_id = lst["id"]
+    print(f"List created: {lst}")
+
+    # 3. Create a task inside the list
+    res = client.post(
+        f"/api/lists/{list_id}/tasks/",
+        json={"title": "Task1"},
+        headers=auth["headers"]
+    )
+    task = res.json()
+    task_id = task["id"]
+    print(f"Task created: {task}")
+
+    # 4. Check that all exist before delete
+    res = client.get(f"/api/boards/{board_id}", headers=auth["headers"])
+    print(f"Board before delete: {res.status_code}")
+
+    res = client.get(f"/api/boards/{board_id}/lists/", headers=auth["headers"])
+    print(f"Lists before delete: {res.json()}")
+
+    res = client.get(f"/api/lists/{list_id}/tasks/", headers=auth["headers"])
+    print(f"Tasks before delete: {res.json()}")
+
+    # 5. Delete board (should delete list and task too)
+    res = client.delete(f"/api/boards/{board_id}", headers=auth["headers"])
+    print(f"Delete board response: {res.status_code}")
+    assert res.status_code == 204
+    print("\n--- AFTER DELETE ---")
+
+    # 6. Check board does not exist
+    res = client.get(f"/api/boards/{board_id}", headers=auth["headers"])
+    print(f"Board after delete: {res.status_code}")
+
+    # 7. Check lists are gone
+    res = client.get(f"/api/boards/{board_id}/lists/", headers=auth["headers"])
+    print(f"Lists after delete: {res.status_code} | {res.text}")
+
+    # 8. Check tasks are gone
+    res = client.get(f"/api/lists/{list_id}/tasks/", headers=auth["headers"])
+    print(f"Tasks after delete: {res.status_code} | {res.text}")
+
+    print("--- END CASCADE DELETE TEST ---\n")
