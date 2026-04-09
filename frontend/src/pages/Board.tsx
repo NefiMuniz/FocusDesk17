@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { CirclePlus, ListPlus, Search, Pencil, Trash2, Grip, Check, X } from "lucide-react";
+import { CirclePlus, ListPlus, Search, Pencil, Trash2, GripVertical, Check, X } from "lucide-react";
 import { DndContext, DragEndEvent, DragStartEvent, PointerSensor, useSensor, useSensors, closestCorners, DragOverlay } from "@dnd-kit/core";
 import styles from "./Board.module.css";
 import { getBoard, deleteBoard } from "../api/boards";
-import { getLists, deleteList } from "../api/lists";
+import { getLists, deleteList, updateList } from "../api/lists";
 import { getLabels, updateLabel, deleteLabel } from "../api/labels";
 import { reorderTask } from "../api/tasks";
 import { Board as BoardType, TaskList, Label, Task } from "../types";
@@ -17,6 +17,8 @@ import { useNavigate } from "react-router-dom";
 import EditBoardModal from "../components/EditBoardModal";
 import { useQueries } from "@tanstack/react-query";
 import { getTasks } from "../api/tasks";
+import SortableList from "../components/SortableList";
+import { SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable";
 
 const Board = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,6 +35,8 @@ const Board = () => {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [filterLabelId, setFilterLabelId] = useState("");
   const [filterDueDate, setFilterDueDate] = useState("");
+  const [showDone, setShowDone] = useState(false);
+  const [activeList, setActiveList] = useState<TaskList | null>(null);
 
   const today = new Date().toISOString().split("T")[0];
   const endOfWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
@@ -179,8 +183,15 @@ const Board = () => {
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
-    const allTasks = queryClient.getQueriesData<Task[]>({ queryKey: ["tasks"] });
-    for (const [, tasks] of allTasks) {
+    
+    if (active.data.current?.type === "list") {
+      const list = lists.find(l => `list-${l.id}` === active.id);
+      if (list) setActiveList(list);
+      return;
+    }
+  
+    const allTasksData = queryClient.getQueriesData<Task[]>({ queryKey: ["tasks"] });
+    for (const [, tasks] of allTasksData) {
       const found = tasks?.find(t => t.id === active.id);
       if (found) { setActiveTask(found); break; }
     }
@@ -188,8 +199,31 @@ const Board = () => {
 
   const handleDragEnd = async (event: DragEndEvent) => {
     setActiveTask(null);
+    setActiveList(null);
     const { active, over } = event;
     if (!over) return;
+  
+    if (active.data.current?.type === "list") {
+      const activeListId = active.data.current.listId as string;
+      const overListId = over.data.current?.listId as string;
+      if (!overListId || activeListId === overListId) return;
+  
+      const oldIndex = lists.findIndex(l => l.id === activeListId);
+      const newIndex = lists.findIndex(l => l.id === overListId);
+      if (oldIndex === -1 || newIndex === -1) return;
+  
+      const newLists = [...lists];
+      const [moved] = newLists.splice(oldIndex, 1);
+      newLists.splice(newIndex, 0, moved);
+      queryClient.setQueryData(["lists", id], newLists);
+  
+      try {
+        await updateList(activeListId, { position: newIndex });
+      } catch {
+        queryClient.invalidateQueries({ queryKey: ["lists", id] });
+      }
+      return;
+    }
 
     const activeId = active.id as string;
     const overId = over.id as string;
@@ -335,13 +369,21 @@ const Board = () => {
               <CirclePlus size={16} />
               Add Task
             </button>
-          </div>
-
-          <div className={styles.buttonRowRight}>
             <button className={styles.editButton} onClick={() => setIsEditBoardModalOpen(true)} aria-label="Edit board">
               <Pencil size={16} />
               Edit Board
             </button>
+          </div>
+          <div className={styles.buttonRowRight}>
+            <label className={styles.toggleLabel}>
+              <input
+                type="checkbox"
+                checked={showDone}
+                onChange={(e) => setShowDone(e.target.checked)}
+                className={styles.toggleCheckbox}
+              />
+              Show completed tasks
+            </label>
           </div>
         </div>
 
@@ -359,41 +401,55 @@ const Board = () => {
           </div>
         ) : (
           <div className={styles.listsContainer}>
-            {lists.map(list => (
-              <div key={list.id} className={styles.listWrapper}>
-                <div className={styles.listColumn}>
-                  <div className={styles.listHeader}>
-                    <h2 className={styles.listName}>{list.name}</h2>
-                    <button className={styles.listOptionsButton} aria-label="List options">
-                    <Grip size={18} />
-                    </button>
-                  </div>
-                  <DroppableList listId={list.id} className={styles.taskList}>
-                  <TaskCard listId={list.id} searchQuery={activeSearch} filterLabelId={filterLabelId} filterDueDate={filterDueDate} />
-                  </DroppableList>
-                  <div className={styles.listFooter}>
-                    <button className={styles.listFooterButton} aria-label="Edit list">
-                      <Pencil size={16} />
-                    </button>
-                    <button
-                      className={styles.deleteButtonFooter}
-                      aria-label="Delete list"
-                      onClick={() => handleDeleteList(list)}
-                      disabled={list.tasks && list.tasks.length > 0}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-                <button
-                  className={styles.addListButton}
-                  onClick={() => setIsAddListModalOpen(true)}
-                  aria-label="Add new list"
-                >
-                  <ListPlus size={20} />
-                </button>
-              </div>
-            ))}
+            <SortableContext
+              items={lists.map(l => `list-${l.id}`)}
+              strategy={horizontalListSortingStrategy}
+            >
+              {lists.map(list => (
+                <SortableList key={list.id} listId={list.id}>
+                  {({ attributes, listeners }) => (
+                    <div className={styles.listWrapper}>
+                      <div className={styles.listColumn}>
+                        <div className={styles.listHeader}>
+                          <h2 className={styles.listName}>{list.name}</h2>
+                          <button 
+                            className={styles.listOptionsButton} 
+                            aria-label="Drag to reorder list"
+                            {...attributes}
+                            {...listeners}
+                            >
+                            <GripVertical size={18} />
+                          </button>
+                        </div>
+                        <DroppableList listId={list.id} className={styles.taskList}>
+                          <TaskCard listId={list.id} searchQuery={activeSearch} filterLabelId={filterLabelId} filterDueDate={filterDueDate} showDone={showDone} />
+                        </DroppableList>
+                        <div className={styles.listFooter}>
+                          <button className={styles.listFooterButton} aria-label="Edit list">
+                            <Pencil size={16} />
+                          </button>
+                          <button
+                            className={styles.deleteButtonFooter}
+                            aria-label="Delete list"
+                            onClick={() => handleDeleteList(list)}
+                            disabled={list.tasks && list.tasks.length > 0}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                      <button
+                        className={styles.addListButton}
+                        onClick={() => setIsAddListModalOpen(true)}
+                        aria-label="Add new list"
+                      >
+                        <ListPlus size={20} />
+                      </button>
+                    </div>
+                  )}
+                </SortableList>
+              ))}
+            </SortableContext>
           </div>
         )}
 
@@ -456,6 +512,13 @@ const Board = () => {
         {isEditBoardModalOpen && board && <EditBoardModal board={board} onClose={() => setIsEditBoardModalOpen(false)} />}
       </div>
       <DragOverlay>
+        {activeList && (
+          <div className={styles.listColumnOverlay}>
+            <div className={styles.listHeader}>
+              <h2 className={styles.listName}>{activeList.name}</h2>
+            </div>
+          </div>
+        )}
         {activeTask && (
           <div className={styles.dragOverlayCard}>
             <div className={styles.cardHeader}>
