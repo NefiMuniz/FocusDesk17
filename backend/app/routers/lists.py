@@ -47,6 +47,20 @@ def get_list_or_404(db: Session, list_id: UUID, user_id: UUID) -> TaskList:
         raise HTTPException(status_code=404, detail="List not found")
     return task_list
 
+@router.get("/api/lists/{list_id}", response_model=ListResponse)
+def get_list(
+    list_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Returns a single list (column) by ID.
+    Member 2: useful if you need to refresh one column header without
+    re-fetching the entire board.
+        queryKey: ['lists', 'single', listId]
+    """
+    return get_list_or_404(db, list_id, current_user.id)
+
 
 @router.get("/api/boards/{board_id}/lists/", response_model=list[ListResponse])
 def get_lists(
