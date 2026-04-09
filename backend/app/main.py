@@ -55,11 +55,12 @@ async def add_security_headers(request: Request, call_next):
     response.headers["X-Content-Type-Options"] = "nosniff"
 
     # Content Security Policy (Defense against XSS)
-    response.headers["Content-Security-Policy"] = (
-        "default-src 'self'; "
-        "script-src 'self' 'wasm-unsafe-eval'; "
-        "style-src 'self' 'unsafe-inline';"
-    )
+    if not request.url.path.startswith(("/docs", "/redoc", "/openapi.json")):
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self' 'wasm-unsafe-eval'; "
+            "style-src 'self' 'unsafe-inline';"
+        )
 
     # Enforces HTTPS (HSTS)
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
