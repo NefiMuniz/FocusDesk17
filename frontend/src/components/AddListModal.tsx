@@ -15,7 +15,6 @@ const AddListModal = ({ boardId, onClose }: AddListModalProps) => {
   useModalKeyboard(onClose);
   const trapRef = useFocusTrap();
   const [name, setName] = useState("");
-  const [position, setPosition] = useState("");
   const [error, setError] = useState("");
   const queryClient = useQueryClient();
 
@@ -32,10 +31,6 @@ const AddListModal = ({ boardId, onClose }: AddListModalProps) => {
     setError("");
     if (name.trim().length < 2) {
       setError("List name must be at least 2 characters.");
-      return;
-    }
-    if (position.trim().length < 1) {
-      setError("Please set a position");
       return;
     }
     mutation.mutate();
@@ -60,14 +55,6 @@ const AddListModal = ({ boardId, onClose }: AddListModalProps) => {
               placeholder="e.g. To-Do"
               value={name}
               onChange={(e) => setName(e.target.value)}
-            />
-            <label htmlFor="list-name">Position *</label>
-            <input
-              id="list-position"
-              type="number"
-              placeholder="e.g. 1"
-              value={position}
-              onChange={(e) => setPosition(e.target.value)}
             />
             {error && <p role="alert" className={styles.fieldError}>{error}</p>}
             {mutation.isError && (

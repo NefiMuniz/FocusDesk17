@@ -14,6 +14,7 @@ interface TaskCardProps {
   searchQuery: string;
   filterLabelId?: string;
   filterDueDate?: string;
+  showDone?: boolean;
 }
 
 const statusLabel: Record<string, string> = {
@@ -22,7 +23,7 @@ const statusLabel: Record<string, string> = {
   done: "Done",
 };
 
-const TaskCard = ({ listId, searchQuery, filterLabelId, filterDueDate }: TaskCardProps) => {
+const TaskCard = ({ listId, searchQuery, filterLabelId, filterDueDate, showDone }: TaskCardProps) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const queryClient = useQueryClient();
 
@@ -32,6 +33,8 @@ const TaskCard = ({ listId, searchQuery, filterLabelId, filterDueDate }: TaskCar
   });
 
   const filteredTasks = tasks.filter((task) => {
+    if (!showDone && task.status === "done") return false;
+
     const matchesSearch =
       task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.description?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -102,7 +105,7 @@ const TaskCard = ({ listId, searchQuery, filterLabelId, filterDueDate }: TaskCar
             >
               <div className={styles.cardHeader}>
                 <div className={styles.cardTitle}>
-                  <Grip size={14} className={styles.cardGrip} />
+                  <Grip size={12} className={styles.cardGrip} />
                   <span className={styles.taskTitle}>{task.title}</span>
                 </div>
                 {task.labels.length > 0 && (
