@@ -5,12 +5,15 @@ import { Outlet } from "react-router-dom";
 const Layout = () => {
     return (
         <>
-        <Navbar />
-        <main>
-          <Outlet /> 
-        </main>
-        <Footer />
-      </>
+          <a href="#main-content" className="skipLink">
+            Skip to main content
+          </a>
+          <Navbar />
+          <main id="main-content">
+            <Outlet />
+          </main>
+          <Footer />
+        </>
     );
 };
 

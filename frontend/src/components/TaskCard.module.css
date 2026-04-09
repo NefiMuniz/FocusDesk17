@@ -1,0 +1,135 @@
+.card {
+    background: linear-gradient(135deg, #cdffd8, #94b9ff);
+    border-radius: 0.6rem;
+    padding: 0.3rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    transition: transform 0.2s;
+    border: 1px solid #118AB2;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.2rem;
+}
+
+.statusRow{
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.cardTitle{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.2rem;
+}
+
+.cardGrip{
+    color:#07384C;
+    opacity: 1;
+}
+
+.statusRow{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.taskTitle {
+    font-family: "Poppins", sans-serif;
+    font-weight: bolder;
+    color:#07384C;
+    font-size: 0.8rem;
+}
+
+.labelBadge {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-align: center;
+    color: #fff;
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.4rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    width: 20%;
+    min-height: 20px;
+}
+
+.statusBadge {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: #07384C;
+    opacity: 1;
+}
+
+.dueDate {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.6rem;
+    color: #07384C;
+    opacity: 1;
+}
+
+.description {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.7rem;
+    color: #07384C;
+    opacity: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.cardFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.1rem;
+    margin-top: 0.3rem;
+}
+
+.iconButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #07384C;
+    opacity: 1;
+    padding: 0.2rem;
+    border-radius: 0.3rem;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.5s;
+}
+
+.iconButton:hover {
+    transform: scale(1.15);
+}
+
+.iconButtonDelete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--light-red);
+    opacity: 1;
+    padding: 0.2rem;
+    border-radius: 0.3rem;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.5s;
+}
+
+.iconButtonDelete:hover {
+    transform: scale(1.15);
+}

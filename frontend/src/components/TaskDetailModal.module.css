@@ -193,9 +193,9 @@ color: #07384C;
 }
 
 .deleteButton {
-border: 2px solid #EF476F;
+border: 2px solid var(--dark-red);
 background: none;
-color: #EF476F;
+color: var(--dark-red);
 }
 
 .editButton:hover,
@@ -212,8 +212,47 @@ cursor: not-allowed;
 }
 
 .error {
-color: #8b0000;
+color: var(--dark-red);
 font-family: "Poppins", sans-serif;
 font-size: 0.9rem;
 text-align: center;
+}
+
+.labelBadgeHeader {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+    padding: 0.2rem 0.7rem;
+    border-radius: 0.4rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.labelPicker {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.labelOption {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+    padding: 0.2rem 0.7rem;
+    border-radius: 0.4rem;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: opacity 0.2s, border-color 0.2s;
+    opacity: 0.5;
+}
+
+.labelOptionActive {
+    opacity: 1;
+    border-color: #07384C;
+}
+
+.labelOption:hover {
+    opacity: 0.85;
 }
