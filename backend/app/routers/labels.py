@@ -34,6 +34,20 @@ def get_label_or_404(db: Session, label_id: UUID, user_id: UUID) -> Label:
     return label
 
 
+@router.get("/{label_id}", response_model=LabelResponse)
+def get_label(
+    label_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Returns a single label by ID.
+    Member 2: useful to refresh one label after an update without
+    re-fetching the full label list.
+        queryKey: ['labels', labelId]
+    """
+    return get_label_or_404(db, label_id, current_user.id)
+
 @router.get("/", response_model=list[LabelResponse])
 def get_labels(
     current_user: User = Depends(get_current_user),

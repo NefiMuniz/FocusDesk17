@@ -1,13 +1,13 @@
 import logging
 from contextlib import asynccontextmanager
-
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-
 from app.config import settings
 from app.routers import boards, lists, tasks, labels, auth
+from app.middleware.rate_limit import limiter, rate_limit_error_handler
+from slowapi.errors import RateLimitExceeded
 
 logger = logging.getLogger("focusdesk")
 
@@ -41,6 +41,35 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    """
+    Global Security Headers Middleware
+    """
+    response = await call_next(request)
+
+    # Prevents Clickjacking
+    response.headers["X-Frame-Options"] = "DENY"
+
+    # Prevents MIME-sniffing
+    response.headers["X-Content-Type-Options"] = "nosniff"
+
+    # Content Security Policy (Defense against XSS)
+    if not request.url.path.startswith(("/docs", "/redoc", "/openapi.json")):
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self' 'wasm-unsafe-eval'; "
+            "style-src 'self' 'unsafe-inline';"
+        )
+
+    # Enforces HTTPS (HSTS)
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+
+    return response
+
+#Register rate Limiter
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, rate_limit_error_handler)
 
 # Global Exception Handlers
 
