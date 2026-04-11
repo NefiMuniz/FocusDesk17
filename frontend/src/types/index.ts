@@ -24,7 +24,9 @@ export interface Task {
     position: number;
     list_id: string;
     labels: Label[];
-}
+    created_at: string;
+    updated_at: string;
+  }
 
 export interface Label {
     id: string;

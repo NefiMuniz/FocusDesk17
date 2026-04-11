@@ -12,7 +12,7 @@
   --text-primary: #EEF5FB;
   --text-nav: #EEF5FB;
   --nav-active: #06D6A0;
-  --padding-nav:0.01rem 3rem;
+  --padding-nav:0.01rem 7rem;
   --rounded-button: #06D6A0;
   --dark-red: #8b0000;
   --light-red: #EF476F;
@@ -27,7 +27,7 @@
   --text-primary: #07384C;
   --text-nav: #07384C;
   --nav-active: #8b0000;
-  --padding-nav:0.5rem 3rem;
+  --padding-nav:0.5rem 7rem;
   --rounded-button: #118AB2;
   --dark-red: #8b0000;
   --light-red: #EF476F;
@@ -55,9 +55,9 @@ main {
   position: absolute;
   top: -100%;
   left: 0;
-  background: #118AB2;
-  color: #fff;
-  padding: 0.5rem 1rem;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  padding: 0.3rem;
   font-family: "Poppins", sans-serif;
   font-weight: 600;
   z-index: 9999;
@@ -68,6 +68,8 @@ main {
 
 .skipLink:focus {
   top: 0;
+  outline: 3px solid #FFD166;
+  outline-offset: 2px;
 }
 
 @media (max-width: 768px) {

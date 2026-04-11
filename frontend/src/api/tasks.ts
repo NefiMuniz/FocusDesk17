@@ -13,3 +13,5 @@ export const addLabel = (taskId: string, labelId: string) =>
   api.post(`/tasks/${taskId}/labels/${labelId}`);
 export const removeLabel = (taskId: string, labelId: string) => 
   api.delete(`/tasks/${taskId}/labels/${labelId}`);
+export const getAllTasks = () => api.get("/tasks/");
+export const getCompletedTasks = () => api.get("/tasks/completed");
