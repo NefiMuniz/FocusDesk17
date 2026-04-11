@@ -7,7 +7,7 @@
 }
 
 .hero {
-    background: linear-gradient(135deg, #cdffd8, #94b9ff);
+    background: #EEF5F8;
     border-radius: 1rem;
     padding: 3rem 2.5rem;
     border: 2px solid #06D6A0;
@@ -27,10 +27,14 @@
     color: #07384C;
     line-height: 1.2;
     margin-bottom: 1rem;
+    background: linear-gradient(to right, #118AB2, #06D6A0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .heroTitleAccent {
-    background: linear-gradient(to right, #118AB2, #06D6A0);
+    background: linear-gradient(to right,  #07384C, #118AB2, #06D6A0,  #07384C);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -49,7 +53,7 @@
     padding: 0.5rem 1.5rem;
     border-radius: 2rem;
     border: 2px solid #118AB2;
-    background: rgba(255, 255, 255, 0.5);
+    background: linear-gradient(135deg, #cdffd8, #94b9ff);
     font-family: "Poppins", sans-serif;
     font-size: 0.9rem;
     font-weight: 600;
@@ -64,7 +68,7 @@
 }
 
 .whySection {
-    background: linear-gradient(135deg, #cdffd8, #94b9ff);
+    background: linear-gradient(135deg, #94b9ff, #cdffd8);
     border-radius: 1rem;
     padding: 2.5rem;
     border: 2px solid #06D6A0;
@@ -98,7 +102,7 @@
 }
 
 .featureCard {
-    background: rgba(255, 255, 255, 0.5);
+    background: #EEF5F8;
     border-radius: 0.8rem;
     padding: 1.5rem;
     border: 2px solid #06D6A0;
@@ -121,7 +125,7 @@
 .featureTitle {
     font-family: "Sniglet", sans-serif;
     font-size: 1.1rem;
-    color: #118AB2;
+    color: #07384C;
     text-align: center;
 }
 
@@ -135,7 +139,8 @@
 }
 
 .howSection {
-    background: linear-gradient(135deg, #cdffd8, #94b9ff);
+    /*background: linear-gradient(135deg, #94b9ff, #cdffd8);*/
+    background: #EEF5F8;
     border-radius: 1rem;
     padding: 2.5rem;
     border: 2px solid #06D6A0;

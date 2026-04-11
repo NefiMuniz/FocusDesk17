@@ -207,24 +207,29 @@ const Board = () => {
       const activeListId = active.data.current.listId as string;
       const overListId = over.data.current?.listId as string;
       if (!overListId || activeListId === overListId) return;
-  
+    
       const oldIndex = lists.findIndex(l => l.id === activeListId);
       const newIndex = lists.findIndex(l => l.id === overListId);
       if (oldIndex === -1 || newIndex === -1) return;
-  
+    
       const newLists = [...lists];
       const [moved] = newLists.splice(oldIndex, 1);
       newLists.splice(newIndex, 0, moved);
       queryClient.setQueryData(["lists", id], newLists);
-  
+    
       try {
-        await updateList(activeListId, { position: newIndex });
+        await Promise.all(
+          newLists.map((list, index) =>
+            updateList(list.id, { position: index })
+          )
+        );
+        queryClient.invalidateQueries({ queryKey: ["lists", id] });
       } catch {
         queryClient.invalidateQueries({ queryKey: ["lists", id] });
       }
       return;
     }
-
+    
     const activeId = active.id as string;
     const overId = over.id as string;
 

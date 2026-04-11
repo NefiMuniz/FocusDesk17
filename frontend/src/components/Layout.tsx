@@ -6,7 +6,7 @@ const Layout = () => {
     return (
         <>
           <a href="#main-content" className="skipLink">
-            Skip to main content
+            Skip to main.
           </a>
           <Navbar />
           <main id="main-content">

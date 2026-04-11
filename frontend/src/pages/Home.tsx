@@ -22,7 +22,7 @@ const Home = () => {
           <p className={styles.heroSubtitle}>
             Create tasks and boards. Manage work, personal and academic tasks and keep yourself productive.
           </p>
-          <button className={styles.heroButton} onClick={() => navigate("/login")}>
+          <button className={styles.heroButton} onClick={() => navigate("/login", { state: { openRegister: true } })}>
             Start Here
           </button>
         </div>
@@ -72,7 +72,7 @@ const Home = () => {
           <p className={styles.ctaSubtitle}>
             Join thousands of professionals and students who have found their perfect time management through FocusDesk17.
           </p>
-          <button className={styles.ctaButton} onClick={() => navigate("/login")}>
+          <button className={styles.ctaButton} onClick={() => navigate("/login", { state: { openRegister: true } })}>
             Get Started
           </button>
         </div>

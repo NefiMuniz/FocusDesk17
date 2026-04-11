@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { login, registerUser } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
 import styles from "./Login.module.css";
@@ -13,6 +13,7 @@ interface FormErrors {
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const location = useLocation();
   const { login: authLogin } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,6 +26,14 @@ const Login = () => {
   useEffect(() => {
     document.title = "FocusDesk17 | Login";
   }, []);
+
+  useEffect(() => {
+    if (location.state?.openRegister) {
+      setIsLogin(false);
+  
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location, navigate]);
 
   const validateEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
