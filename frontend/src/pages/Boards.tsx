@@ -154,9 +154,6 @@ const Boards = () => {
         <button className={styles.button} onClick={() => setIsModalOpen(true)}>
           <PlusCircle size={18} aria-hidden="true" /> Add New Board
         </button>
-        <button className={styles.button}>
-          <LayoutDashboard size={18} aria-hidden="true" /> Manage Boards
-        </button>
         <button className={styles.button} onClick={() => setIsTaskModalOpen(true)}>
           <PlusCircle size={18} aria-hidden="true" /> Add New Task
         </button>
