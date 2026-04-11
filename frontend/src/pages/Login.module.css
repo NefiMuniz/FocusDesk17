@@ -132,3 +132,45 @@
     margin-top: -0.3rem;
     margin-bottom: 0.3rem;
 }
+
+.redirectMessage {
+    background-color: #EEF5F8;
+    color: #8b0000;
+    border: 1px solid #FFD166;
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.passwordWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+  
+.passwordWrapper input {
+    width: 100%;
+    padding-right: 2.5rem;
+}
+  
+.eyeButton {
+    position: absolute;
+    right: 0.6rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color:#07384C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.eyeButton:hover {
+    color:#118AB2;
+}

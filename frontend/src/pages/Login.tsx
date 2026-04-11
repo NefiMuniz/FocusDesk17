@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import { login, registerUser } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
 import styles from "./Login.module.css";
@@ -14,6 +15,7 @@ interface FormErrors {
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
   const location = useLocation();
+  const redirectMessage = location.state?.message as string | undefined;
   const { login: authLogin } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,6 +23,8 @@ const Login = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -104,6 +108,8 @@ const Login = () => {
     setPassword("");
     setName("");
     setConfirmPassword("");
+    setShowPassword(false);
+    setShowConfirmPassword(false);
   };
 
   return (
@@ -112,6 +118,10 @@ const Login = () => {
         <h1 className={styles.title}>
           {isLogin ? "Login to FocusDesk17" : "Register to FocusDesk17"}
         </h1>
+
+        {redirectMessage && (
+          <p role="alert" className={styles.redirectMessage}>{redirectMessage}</p>
+        )}
 
         <div className={styles.cardBorder}>
           <div className={styles.card}>
@@ -130,13 +140,23 @@ const Login = () => {
                 {fieldErrors.email && <p role="alert" className={styles.fieldError}>{fieldErrors.email}</p>}
 
                 <label htmlFor="login-password">Password</label>
-                <input
-                  id="login-password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className={styles.passwordWrapper}>
+                  <input
+                    id="login-password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className={styles.eyeButton}
+                    onClick={() => setShowPassword(v => !v)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
                 {fieldErrors.password && <p role="alert" className={styles.fieldError}>{fieldErrors.password}</p>}
 
                 <button type="submit" className={styles.button}>Login</button>
@@ -171,23 +191,43 @@ const Login = () => {
                 {fieldErrors.email && <p role="alert" className={styles.fieldError}>{fieldErrors.email}</p>}
 
                 <label htmlFor="register-password">Password</label>
-                <input
-                  id="register-password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className={styles.passwordWrapper}>
+                  <input
+                    id="register-password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className={styles.eyeButton}
+                    onClick={() => setShowPassword(v => !v)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
                 {fieldErrors.password && <p role="alert" className={styles.fieldError}>{fieldErrors.password}</p>}
 
                 <label htmlFor="register-confirm-password">Confirm Password</label>
-                <input
-                  id="register-confirm-password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
+                <div className={styles.passwordWrapper}>
+                  <input
+                    id="register-confirm-password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className={styles.eyeButton}
+                    onClick={() => setShowConfirmPassword(v => !v)}
+                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
                 {fieldErrors.confirmPassword && <p role="alert" className={styles.fieldError}>{fieldErrors.confirmPassword}</p>}
 
                 <button type="submit" className={styles.button}>Register</button>

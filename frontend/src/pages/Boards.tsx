@@ -1,9 +1,9 @@
-import { useQueries, useQuery } from "@tanstack/react-query";
-import { BadgeAlert, BadgeCheck, CalendarCheck2, Goal, LayoutDashboard, Pencil, PlusCircle, ShieldAlert, SquareDashedKanban } from "lucide-react";
+import { useQueries, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { BadgeAlert, BadgeCheck, CalendarCheck2, Goal, Pencil, PlusCircle, ShieldAlert, SquareDashedKanban, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { getBoards } from "../api/boards";
+import { getBoards, deleteBoard } from "../api/boards";
 import { getLists } from "../api/lists";
 import { getAllTasks } from "../api/tasks";
 import CreateBoardModal from "../components/CreateBoardModal";
@@ -43,6 +43,7 @@ const Boards = () => {
 
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -66,6 +67,23 @@ const Boards = () => {
   });
 
   const allLists: TaskList[] = listQueries.flatMap(q => q.data ?? []);
+
+  const deleteBoardMutation = useMutation({
+    mutationFn: (boardId: string) => deleteBoard(boardId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["boards"] });
+    },
+    onError: () => {
+      alert("Error while deleting the board. Try again.");
+    },
+  });
+
+  const handleDeleteBoard = (e: React.MouseEvent, boardId: string) => {
+    e.stopPropagation();
+    if (window.confirm("Are you sure you want to delete this board?")) {
+      deleteBoardMutation.mutate(boardId);
+    }
+  };
 
   const getTaskBoard = (task: Task): string => {
     const list = allLists.find(l => l.id === task.list_id);
@@ -208,7 +226,17 @@ const Boards = () => {
           {boards.map(board => (
             <div key={board.id} className={styles.cardBorder} onClick={() => navigate(`/board/${board.id}`)}>
               <div className={styles.boardCard}>
-                <h3 className={styles.boardName}>{board.name}</h3>
+                <div className={styles.boardCardHeader}>
+                  <h3 className={styles.boardName}>{board.name}</h3>
+                  <button
+                    className={styles.boardDeleteButton}
+                    aria-label={`Delete board ${board.name}`}
+                    onClick={(e) => handleDeleteBoard(e, board.id)}
+                    disabled={deleteBoardMutation.isPending}
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
                 <p className={styles.boardDescription}>{board.description}</p>
               </div>
             </div>

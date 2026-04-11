@@ -264,6 +264,32 @@
     gap: 0.5rem;
 }
 
+.boardCardHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.boardDeleteButton{
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    background:none;
+    color: var(--light-red);
+    cursor: pointer;
+    display: flex;
+    align-items:flex-start;
+    justify-content:flex-end;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+    margin: 0 0.1rem;
+}
+
+.boardDeleteButton:hover {
+    transform: scale(1.15);
+}
+
 .boardName {
     font-family: "Sniglet", sans-serif;
     color: #07384C;

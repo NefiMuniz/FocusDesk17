@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "../components/Layout";
+import PrivateRoute from "../components/PrivateRoute";
 import Home from "../pages/Home";
 import Boards from "../pages/Boards";
 import Board from "../pages/Board";
@@ -11,8 +12,8 @@ const AppRoutes = () => {
       <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
-            <Route path="/boards" element={<Boards />} />
-            <Route path="/board/:id" element={<Board />} />
+            <Route path="/boards" element={<PrivateRoute><Boards /></PrivateRoute>} />
+            <Route path="/board/:id" element={<PrivateRoute><Board /></PrivateRoute>} />
             <Route path="/login" element={<Login />} />            
           </Route>
       </Routes>
